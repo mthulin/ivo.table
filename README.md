@@ -7,7 +7,7 @@ The package was developed at [IVO](https://www.ivo.se), The Health and Social Ca
 To install the package from CRAN:
 
 ```
-install.packages("ivo_table")
+install.packages("ivo.table")
 ```
 
 To install the development version from Github:
