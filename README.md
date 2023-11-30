@@ -14,7 +14,7 @@ To install the development version from Github:
 
 ```
 library(devtools)
-install_github("mthulin/ivo_table")
+install_github("mthulin/ivo.table")
 ```
 
 ## Examples
