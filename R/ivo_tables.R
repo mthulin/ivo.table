@@ -568,7 +568,7 @@ ivo_flextable_theme <- function(x, kway = 2, rowsums = FALSE, caption = NA, high
 #' ivo_table(data2_swap) # Swap order of the columns
 #' ivo_table(data2, colsums = TRUE) # Add the sum of each column
 #' ivo_table(data2, rowsums = TRUE) # Add the sum of each row
-#' ivo_table(data2, caption = "Min bästa tabell") # Add a caption
+#' ivo_table(data2, caption = "Awesome table") # Add a caption
 #' ivo_table(data2, highlight_cols = 3) # Highlight column 3
 #' ivo_table(data2, highlight_rows = 2, highlight_cols = 3) # Highlight cell at row 2 column 3
 #'
@@ -664,6 +664,9 @@ ivo_table <- function(df, extra_header = TRUE, exclude_missing = FALSE, colsums 
     df <- df |> dplyr::rename_at(dplyr::vars(names(df)), ~var_name)
     message("Dots have been replaced with spaces in the variable names.")
   }
+
+  # Convert factors to characters (required for dealing with missing values):
+  df <- apply(df, 2, as.character) |> as.data.frame()
 
   # Number of variables in df
   if (length(var_name) == 1) {
@@ -768,6 +771,9 @@ ivo_table_masked <- function(df, cell = 5, extra_header = TRUE, exclude_missing 
     df <- df |> dplyr::rename_at(dplyr::vars(names(df)), ~var_name)
     message("Dots have been replaced with spaces in the variable names.")
   }
+
+  # Convert factors to characters (required for dealing with missing values):
+  df <- apply(df, 2, as.character) |> as.data.frame()
 
   # Number of variables in df
   if (length(var_name) == 1) {

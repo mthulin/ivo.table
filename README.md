@@ -1,5 +1,5 @@
 # ivo.table
-This R package provides functions for easily creating nicely formatted frequency tables and contingency tables (cross-tables), that are straightforward to export to HTML or Office documents. It is based on `flextable`, and uses `openxlsx` for exporting the tables to Excel.
+This R package provides functions for easily creating nicely formatted frequency tables and contingency tables (cross-tables), that are straightforward to export to HTML or Office documents. It can do 1-way tables (wide or long), 2-way tables, 3-way tables and 4-way tables. It is based on `flextable`, and uses `openxlsx` for exporting the tables to Excel.
 
 The package was developed at [IVO](https://www.ivo.se), The Health and Social Care Inspectorate in Sweden.
 
@@ -18,7 +18,7 @@ install_github("mthulin/ivo.table")
 ```
 
 ## Examples
-This package is used to quickly create pretty frequency tables and contingency tables/cross-tables. The main function is `ivo_table`. In addition, it is also possible to create masked tables using `ivo_table_masked`.
+This package is used to quickly create pretty frequency tables and contingency tables/cross-tables. The main function is `ivo_table`. In addition, it is also possible to create masked tables, where cells with low counts are censored, using `ivo_table_masked`.
 
 Below, we give some examples of how to create and format tables. First, we generate some example data.
 
@@ -47,7 +47,7 @@ ivo_table_masked(data1, cell = 15) # Counts below <=15 are masked
 example_data |> dplyr::select(Year) |> ivo_table()
 ```
 
-### 2-way tables
+### 2-way tables (contingency tables)
 ```
 data2 <- example_data |> dplyr::select(A, B)
 data2_swap <- example_data |> dplyr::select(B, A)
@@ -57,7 +57,7 @@ ivo_table(data2)
 ivo_table(data2_swap) # Swap order of the columns
 ivo_table(data2, colsums = TRUE) # Add the sum of each column
 ivo_table(data2, rowsums = TRUE) # Add the sum of each row
-ivo_table(data2, caption = "Min bästa tabell") # Add a caption
+ivo_table(data2, caption = "Awesome table") # Add a caption
 ivo_table(data2, highlight_cols = 3) # Highlight column 3
 ivo_table(data2, highlight_rows = 2, highlight_cols = 3) # Highlight cell at row 2 column 3
 
@@ -136,4 +136,11 @@ ivo_table_masked(data4, colsums = TRUE, rowsums = TRUE)
 
 ```
 ivo_table_masked(data4, colsums = TRUE, rowsums = TRUE) |> ivo_flextable_to_xlsx("example_table")
+```
+
+### Exporting to a Word docx file
+To export a table to a docx file, use `save_as_docx` from `flextable` as follows:
+
+```
+ivo_table_masked(data4, colsums = TRUE, rowsums = TRUE) |> flextable::save_as_docx(path = "example_table.docx")
 ```
