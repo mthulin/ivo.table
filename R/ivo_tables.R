@@ -69,7 +69,7 @@ ivo_tab2_step1 <- function(df, v1, v4, exclude_missing)
 
 ivo_tab2_step2 <- function(df, v1, v4, extra_header, colsums, rowsums, percent_by, remove_zero_rows)
 {
-  Summa <- NULL
+  Total <- NULL
   ncol_v4 <- df |> dplyr::pull({{v4}}) |> unique() |> length()
   name_v4 <- df |> dplyr::select({{v4}}) |> names()
 
@@ -90,9 +90,9 @@ ivo_tab2_step2 <- function(df, v1, v4, extra_header, colsums, rowsums, percent_b
     new_row <- NA } else {
 
       # Add column or the sum of each column if requested:
-      df$Summa <- unlist(apply(df[,-1], 1, ivo_num_sum))
-      if(remove_zero_rows) { df |> dplyr::filter(Summa > 0 | Summa == "-") -> df }
-      if(!rowsums) { df |> dplyr::select(-Summa) -> df }
+      df$Total <- unlist(apply(df[,-1], 1, ivo_num_sum))
+      if(remove_zero_rows) { df |> dplyr::filter(Total > 0 | Total == "-") -> df }
+      if(!rowsums) { df |> dplyr::select(-Total) -> df }
       new_row <- c(apply(df, 2, ivo_num_sum), "Total")
       names(new_row)[length(new_row)] <- names(df)[1]
     }
@@ -121,7 +121,7 @@ ivo_tab3_step1 <- function(df, v1, v3, v4, exclude_missing)
 ivo_tab3_step2 <- function(df, v1, v3, v4, extra_header, colsums, rowsums, percent_by, remove_zero_rows)
 {
 
-  Summa <- NULL
+  Total <- NULL
   ncol_v4 <- df |> dplyr::pull({{v4}}) |> unique() |> length()
   name_v4 <- df |> dplyr::select({{v4}}) |> names()
   name_v1 <- df |> dplyr::select({{v1}}) |> names()
@@ -143,9 +143,9 @@ ivo_tab3_step2 <- function(df, v1, v3, v4, extra_header, colsums, rowsums, perce
     new_row <- NA } else {
 
       # Add column or the sum of each column if requested:
-      df$Summa <- unlist(apply(df[,c(-1, -2)], 1, ivo_num_sum))
-      if(remove_zero_rows) { df |> dplyr::filter(Summa > 0 | Summa == "-") -> df }
-      if(!rowsums) { df |> dplyr::select(-Summa) -> df }
+      df$Total <- unlist(apply(df[,c(-1, -2)], 1, ivo_num_sum))
+      if(remove_zero_rows) { df |> dplyr::filter(Total > 0 | Total == "-") -> df }
+      if(!rowsums) { df |> dplyr::select(-Total) -> df }
       new_row <- c(apply(df[,c(-1,-2)], 2, ivo_num_sum), "Total", NA)
       names(new_row)[length(new_row) + c(-1, 0)] <- names(df)[1:2]
     }
@@ -176,7 +176,7 @@ ivo_tab4_step1 <- function(df, v1, v2, v3, v4, exclude_missing)
 ivo_tab4_step2 <- function(df, v1, v2, v3, v4, extra_header, colsums, rowsums, percent_by, remove_zero_rows)
 {
 
-  Summa <- NULL
+  Total <- NULL
   ncol_v4 <- df |> dplyr::pull({{v4}}) |> unique() |> length()
   name_v4 <- df |> dplyr::select({{v4}}) |> names()
   name_v2 <- df |> dplyr::select({{v2}}) |> names()
@@ -199,9 +199,9 @@ ivo_tab4_step2 <- function(df, v1, v2, v3, v4, extra_header, colsums, rowsums, p
     new_row <- NA } else {
 
       # Add column or the sum of each column if requested:
-      df$Summa <- unlist(apply(df[,c(-1, -2, -3)], 1, ivo_num_sum))
-      if(remove_zero_rows) { df |> dplyr::filter(Summa > 0 | Summa == "-") -> df }
-      if(!rowsums) { df |> dplyr::select(-Summa) -> df }
+      df$Total <- unlist(apply(df[,c(-1, -2, -3)], 1, ivo_num_sum))
+      if(remove_zero_rows) { df |> dplyr::filter(Total > 0 | Total == "-") -> df }
+      if(!rowsums) { df |> dplyr::select(-Total) -> df }
       new_row <- c(apply(df[,c(-1,-2, -3)], 2, ivo_num_sum), "Total", NA, NA)
       names(new_row)[length(new_row) + c(-2, -1, 0)] <- names(df)[1:3]
     }
@@ -909,22 +909,45 @@ color_or_blank <- function(value) {
   if (grepl("^#(?:[0-9a-fA-F]{3}){1,2}$", value) || value %in% grDevices::colors()) value
 }
 
-# Räkna ut radhöjderna genom att ta värdet (inches) multiplicerat med 72 "points"
-# för att räkna ut rätt enhet till radhöjd i Excel
+# Calculate row heights by a general rule of thumb:
+# Font size in points + 4. Here we add 16 to provide more padding in line with how ivo.table is rendered.
+# This gives a fair amount of spacing and also consistent output across platforms.
+# TODO: Allow user to set padding value of rows. Also, this function should probably take a row as input,
+# find the largest font size (in case they vary across columns) and base its return value on that font size.
 calc_row_height <- function(value) {
-  value * 72
+  value + 16
 }
 
-# Fixa bredd
-# guess: genom att utgå från 96 dpi. 1 inch (flextable-bredd) = 12.14 i kolumnbredd i Excel. Detta borde
-# vara funktionellt i de allra flesta fall, men det förutsätter att man är beredd att skruva lite på bredden
-# i sin flextable.
-# auto: Försök matcha bredd automatiskt efter openxlsx inbyggda funktion, funkar bäst om ingen särskild formatering bestämts.
-# none: Sätt ingen specifik bredd. :)
+# Fix column width
+# guess: By calculating the width based on a formula from ECMA-376-1:2016 p. 1601.
+# width = Truncate([{Number of Characters} * {Maximum Digit Width} + {5 pixel padding}]/{Maximum Digit Width}*256)/256
+# This should give a reasonable output that is also consistent across platforms.
+# auto: Tries to match width using the openxlsx built in functionality.
+# none: Use defaults without specific widths. :)
+# TODO: Allow user to set same width across all columns as well as increase/decrease padding.
 set_colwidths <- function(workbook, table_contents, sheet, colwidths) {
   switch(colwidths,
          "guess" = {
-           openxlsx::setColWidths(workbook, sheet, cols = seq_along(table_contents[["body"]][["dataset"]]), widths = table_contents[["header"]][["colwidths"]] * 12.14)
+            # A vector for column widhts
+            colwidths <- c()
+            # Get the names of the dataset to iterate
+            colnames <- names(table_contents[["body"]][["dataset"]])
+            # Go over each column to calculate and add the width
+            for (col in colnames) {
+
+              # Get the longest string in the column (including the variable name itself)
+              longest_value_length <- max(nchar(paste0(col, as.character(table_contents[["body"]][["dataset"]][[col]]))))
+
+              # Calculate the width based on ECMA-376-1:2016
+              # The maximum digit width of 7 pixels (for Calibri 11pt) is an estimate used as a decent rule of thumb.
+              # The 5 is used for padding.
+              width <- round((longest_value_length * 7 + 5) / 7 * 256 / 256, digits = 0)
+
+              colwidths <- append(colwidths, width)
+
+            }
+        
+            openxlsx::setColWidths(workbook, sheet, cols = seq_along(table_contents[["body"]][["dataset"]]), widths = colwidths)
          },
          "auto" = {
            openxlsx::setColWidths(workbook, sheet, cols = seq_along(table_contents[["body"]][["dataset"]]), widths = "auto")
@@ -1007,8 +1030,7 @@ add_style <- function(workbook, sheet, table_contents, caption_size, merge_cells
     openxlsx::addStyle(workbook, sheet, top_var_label_style, rows = start_row, cols = 1:n_cols)
 
     # Hämta radhöjd från header, rad 1
-    row_height <- calc_row_height(table_contents[["header"]][["rowheights"]][1])
-
+    row_height <- calc_row_height(table_contents[["header"]][["styles"]][["text"]][["font.size"]][["data"]][1])
     # Lägg till radhöjd
     openxlsx::setRowHeights(workbook, sheet, start_row, row_height)
 
@@ -1046,12 +1068,12 @@ add_style <- function(workbook, sheet, table_contents, caption_size, merge_cells
         # exempelvis är en tvåvägstabell med extra rubriknivåer
         last_header_row <- nrow(table_contents[["header"]][["content"]][["content"]][["data"]])
         style <- create_style(table_contents, last_header_row, col_i, "header")
-        row_height <- calc_row_height(table_contents[["header"]][["rowheights"]][last_header_row])
+        row_height <- calc_row_height(table_contents[["header"]][["styles"]][["text"]][["font.size"]][["data"]][last_header_row])
         openxlsx::setRowHeights(workbook, sheet, row_i, row_height)
       } else if (row_i == xlsx_length && table_contents$has_sum_row) {
           # Om vi har kommit till sista raden och det finns en summarad så hämtar vi format därifrån
           style <- create_style(table_contents, 1, col_i, "footer")
-          row_height <- calc_row_height(table_contents[["footer"]][["rowheights"]])
+          row_height <- calc_row_height(as.vector(table_contents[["footer"]][["styles"]][["text"]][["font.size"]][["data"]])[1])
           openxlsx::setRowHeights(workbook, sheet, row_i, row_height)
       } else {
 
@@ -1087,7 +1109,7 @@ add_style <- function(workbook, sheet, table_contents, caption_size, merge_cells
         # För att applicera style på rader i body utgYear vi från body_row istället för row_i (annars hamnar vi utanför bounds)
         style <- create_style(table_contents, body_row, col_i, "body")
 
-        row_height <- calc_row_height(table_contents[["body"]][["rowheights"]][body_row])
+        row_height <- calc_row_height(table_contents[["body"]][["styles"]][["text"]][["font.size"]][["data"]][body_row])
 
         # Obs, row_i måste användas för att pricka "rätt" cell i Excel
         openxlsx::setRowHeights(workbook, sheet, row_i, row_height)
