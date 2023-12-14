@@ -795,12 +795,12 @@ create_table_contents <- function(flxtbl) {
       header = flxtbl$header,
       body = flxtbl$body,
       footer = flxtbl$footer,
-      has_sum_col = as.integer(!is.null(flxtbl[["body"]][["dataset"]][["Total"]])),
-      has_sum_row = nrow(flxtbl[["footer"]][["dataset"]]) > 0)
+      footer_rows = nrow(flxtbl$footer$dataset),
+      has_sum_col = as.integer(!is.null(flxtbl$body$dataset$Total)))
 }
 
 get_top_var_label <- function(table_contents) {
-  result <- dplyr::slice(table_contents[["header"]][["dataset"]], 1) |> # Plocka ut en df från header där variabelnamnet finns
+  result <- dplyr::slice(table_contents$header$dataset, 1) |> # Plocka ut en df från header där variabelnamnet finns
     purrr::as_vector() |> # Gör det till en vector
     unname() |> # Inga namn i vektorn, bara värden
     unique() |> # Bara unika värden
@@ -813,7 +813,7 @@ get_top_var_label <- function(table_contents) {
 
 # Antal kolumner in att starta ifrån vid merge av kolumner för top var label
 get_push_top_var <- function(table_contents) {
-  dplyr::slice(table_contents[["header"]][["dataset"]], 1) |> # Plocka ut en df från header där variabelnamnet finns
+  dplyr::slice(table_contents$header$dataset, 1) |> # Plocka ut en df från header där variabelnamnet finns
     purrr::as_vector() |> # Gör det till en vector
     unname() |>  # Inga namn i vektorn, bara värden
     stringr::str_subset(".+", negate = TRUE) |> # Bara blanka strings "" som förekommer
@@ -854,11 +854,34 @@ add_sheet <- function(workbook, sheet_name, table_contents) {
       "body" = {
         # Body behöver vi packa upp och lägga till summa-raden som
         # finns i "footer".
-        if (table_contents$has_sum_row) {
-          contents <- table_contents[[item]][["dataset"]] |>
-            rbind(table_contents[["footer"]][["dataset"]])
+
+        if (table_contents$footer_rows > 0) {
+          # Check if there are any reference symbols
+          txt_values <- apply(table_contents[[item]]$content$content$data, c(1, 2), function(df) unlist(lapply(df, function(x) length(x$txt) > 1)))
+          # Get the x, y coordinates so we can extract the values and put in correct place
+          note_coords <- which(txt_values, arr.ind = T)
+          # If there are coordinates we use those to extract the contents
+          if (length(note_coords) > 0) {
+            for (i in 1:nrow(note_coords)) {
+                row_i <- note_coords[i, 1]
+                col_i <- note_coords[i, 2]
+                
+                # This is where we find the vector, which is extactly of length 2 (1 for value, 1 for ref symbol)
+                txt <- table_contents$body$content$content$data[[row_i, col_i]]$txt
+                # Turn it into a string where we wrap the ref symbol in parenthesis
+                new_txt <- paste0(txt[1], " (", txt[2], ")")
+                # If it's a categorical variable it will be stored as factor, so we need to add the new "value" to its levels
+                if (inherits(table_contents$body$dataset[[row_i, col_i]], "factor")) {
+                    levels(table_contents$body$dataset[[col_i]]) <- c(levels(table_contents$body$dataset[[col_i]]), new_txt)
+                }
+                # Then we add the adjustd value itself to the dataset
+                table_contents$body$dataset[[row_i, col_i]] <- new_txt
+            }
+          }
+          contents <- rbind(table_contents[[item]]$dataset, table_contents$footer$dataset)
+
         } else {
-          contents <- table_contents[[item]][["dataset"]]
+          contents <- table_contents[[item]]$dataset
         }
       },
       # Allt annat skippar vi
@@ -893,7 +916,7 @@ check_text_style <- function(text, row, col) {
   result <- c()
 
   for (style in styles) {
-    flag <- text[[style]][["data"]][[row, col]]
+    flag <- text[[style]]$data[[row, col]]
     if (isTRUE(flag)) {
       result <- append(result, style)
     } else {
@@ -931,26 +954,28 @@ set_colwidths <- function(workbook, table_contents, sheet, colwidths) {
             # A vector for column widhts
             colwidths <- c()
             # Get the names of the dataset to iterate
-            colnames <- names(table_contents[["body"]][["dataset"]])
+            colnames <- names(table_contents$body$dataset)
             # Go over each column to calculate and add the width
             for (col in colnames) {
 
               # Get the longest string in the column (including the variable name itself)
-              longest_value_length <- max(nchar(paste0(col, as.character(table_contents[["body"]][["dataset"]][[col]]))))
+              # TODO: Handle footer length as well
+              longest_value_length <- max(nchar(paste0(col, as.character(table_contents$body$dataset[[col]]))))
 
               # Calculate the width based on ECMA-376-1:2016
               # The maximum digit width of 7 pixels (for Calibri 11pt) is an estimate used as a decent rule of thumb.
               # The 5 is used for padding.
+              # TODO: Look into setting "maximum digit width" based on font size, using some kind of estimate
               width <- round((longest_value_length * 7 + 5) / 7 * 256 / 256, digits = 0)
 
               colwidths <- append(colwidths, width)
 
             }
         
-            openxlsx::setColWidths(workbook, sheet, cols = seq_along(table_contents[["body"]][["dataset"]]), widths = colwidths)
+            openxlsx::setColWidths(workbook, sheet, cols = seq_along(table_contents$body$dataset), widths = colwidths)
          },
          "auto" = {
-           openxlsx::setColWidths(workbook, sheet, cols = seq_along(table_contents[["body"]][["dataset"]]), widths = "auto")
+           openxlsx::setColWidths(workbook, sheet, cols = seq_along(table_contents$body$dataset), widths = "auto")
          },
          "none" = {
            return()
@@ -961,25 +986,25 @@ set_colwidths <- function(workbook, table_contents, sheet, colwidths) {
 create_style <- function(table_contents, row, col, part) {
   openxlsx::createStyle(
     borderColour = c(
-      color_or_blank(table_contents[[part]][["styles"]][["cells"]][["border.color.top"]][["data"]][[row, col]]),
-      color_or_blank(table_contents[[part]][["styles"]][["cells"]][["border.color.bottom"]][["data"]][[row, col]]),
-      color_or_blank(table_contents[[part]][["styles"]][["cells"]][["border.color.left"]][["data"]][[row, col]]),
-      color_or_blank(table_contents[[part]][["styles"]][["cells"]][["border.color.right"]][["data"]][[row, col]])
+      color_or_blank(table_contents[[part]]$styles$cells$border.color.top$data[[row, col]]),
+      color_or_blank(table_contents[[part]]$styles$cells$border.color.bottom$data[[row, col]]),
+      color_or_blank(table_contents[[part]]$styles$cells$border.color.left$data[[row, col]]),
+      color_or_blank(table_contents[[part]]$styles$cells$border.color.right$data[[row, col]])
     ),
     borderStyle = c(
-      check_border_thickness(table_contents[[part]][["styles"]][["cells"]][["border.width.top"]][["data"]][[row, col]]),
-      check_border_thickness(table_contents[[part]][["styles"]][["cells"]][["border.width.bottom"]][["data"]][[row, col]]),
-      check_border_thickness(table_contents[[part]][["styles"]][["cells"]][["border.width.left"]][["data"]][[row, col]]),
-      check_border_thickness(table_contents[[part]][["styles"]][["cells"]][["border.width.right"]][["data"]][[row, col]])
+      check_border_thickness(table_contents[[part]]$styles$cells$border.width.top$data[[row, col]]),
+      check_border_thickness(table_contents[[part]]$styles$cells$border.width.bottom$data[[row, col]]),
+      check_border_thickness(table_contents[[part]]$styles$cells$border.width.left$data[[row, col]]),
+      check_border_thickness(table_contents[[part]]$styles$cells$border.width.right$data[[row, col]])
     ),
     border = c("top", "bottom", "left", "right"),
-    textDecoration = check_text_style(table_contents[[part]][["styles"]][["text"]], row, col),
-    fgFill = color_or_blank(table_contents[[part]][["styles"]][["cells"]][["background.color"]][["data"]][[row, col]]),
-    fontColour = color_or_blank(table_contents[[part]][["styles"]][["text"]][["color"]][["data"]][[row, col]]),
-    fontSize = table_contents[[part]][["styles"]][["text"]][["font.size"]][["data"]][[row, col]],
-    fontName = table_contents[[part]][["styles"]][["text"]][["font.family"]][["data"]][[row, col]],
-    valign = table_contents[[part]][["styles"]][["cells"]][["vertical.align"]][["data"]][[row, col]],
-    halign = table_contents[[part]][["styles"]][["pars"]][["text.align"]][["data"]][[row, col]]
+    textDecoration = check_text_style(table_contents[[part]]$styles$text, row, col),
+    fgFill = color_or_blank(table_contents[[part]]$styles$cells$background.color$data[[row, col]]),
+    fontColour = color_or_blank(table_contents[[part]]$styles$text$color$data[[row, col]]),
+    fontSize = table_contents[[part]]$styles$text$font.size$data[[row, col]],
+    fontName = table_contents[[part]]$styles$text$font.family$data[[row, col]],
+    valign = table_contents[[part]]$styles$cells$vertical.align$data[[row, col]],
+    halign = table_contents[[part]]$styles$pars$text.align$data[[row, col]]
   )
 }
 
@@ -991,7 +1016,7 @@ caption_and_topvar <- function(table_contents) {
 # Lägg till format för varje cell
 add_style <- function(workbook, sheet, table_contents, caption_size, merge_cells) {
 
-  # Sätt startrad (börjar på 1, men addera rader för caption och top_var
+   # Sätt startrad (börjar på 1, men addera rader för caption och top_var
   extra_content <- caption_and_topvar(table_contents)
   start_row <- 1
 
@@ -1016,7 +1041,7 @@ add_style <- function(workbook, sheet, table_contents, caption_size, merge_cells
   if (extra_content[["top_var_label"]]) {
     # Antalet kolumner att merga label över samt applicera style på, men ignorera
     # en eventuell summa-kolumn om den finns.
-    n_cols <- ncol(table_contents[["body"]][["dataset"]])
+    n_cols <- ncol(table_contents$body$dataset)
     merge_label_to <- n_cols - table_contents$has_sum_col
     merge_label_from <- table_contents$push_top_var - table_contents$has_sum_col
 
@@ -1030,7 +1055,7 @@ add_style <- function(workbook, sheet, table_contents, caption_size, merge_cells
     openxlsx::addStyle(workbook, sheet, top_var_label_style, rows = start_row, cols = 1:n_cols)
 
     # Hämta radhöjd från header, rad 1
-    row_height <- calc_row_height(table_contents[["header"]][["styles"]][["text"]][["font.size"]][["data"]][1])
+    row_height <- calc_row_height(table_contents$header$styles$text$font.size$data[1])
     # Lägg till radhöjd
     openxlsx::setRowHeights(workbook, sheet, start_row, row_height)
 
@@ -1038,12 +1063,12 @@ add_style <- function(workbook, sheet, table_contents, caption_size, merge_cells
 
   }
 
-  # Iterera över varje cell för att skapa upp och lägga till formatet för den indivduella cellen
-  for (col_i in seq_along(table_contents[["body"]][["dataset"]])) {
+   # Eftersom caption mm. utgör första raden måste vi räkna ut antalet rader genom att lägga på vYear
+  # beräknade startrad och eventuell summarad (om sådan finns)
+  xlsx_length <- nrow(table_contents$body$dataset) + table_contents$footer_rows + start_row
 
-    # Eftersom caption mm. utgör första raden måste vi räkna ut antalet rader genom att lägga på vYear
-    # beräknade startrad och eventuell summarad (om sådan finns)
-    xlsx_length <- nrow(table_contents[["body"]][["dataset"]][col_i]) + start_row + as.integer(table_contents$has_sum_row)
+  # Iterera över varje cell för att skapa upp och lägga till formatet för den indivduella cellen
+  for (col_i in seq_along(table_contents$body$dataset)) {
 
     # När vi hanterat rubriken kan vi gå vidare till att gå igenom varje cell för att tillämpa
     # temat för tabellen.
@@ -1053,7 +1078,8 @@ add_style <- function(workbook, sheet, table_contents, caption_size, merge_cells
 
     if (merge_cells) {
       # Första radvärde i kolumnen
-      previous_value <- table_contents[["body"]][["dataset"]][[body_row, col_i]]
+      previous_value <- table_contents$body$dataset[[body_row, col_i]]
+
       # En räknare för hur många gånger det förekommer
       value_counter <- 1
       # Startrad för merge
@@ -1066,41 +1092,50 @@ add_style <- function(workbook, sheet, table_contents, caption_size, merge_cells
       if (row_i == start_row) {
         # Ta alltid den sista raden i header för att få "rätt" linjer och färg, ifall det
         # exempelvis är en tvåvägstabell med extra rubriknivåer
-        last_header_row <- nrow(table_contents[["header"]][["content"]][["content"]][["data"]])
+        last_header_row <- nrow(table_contents$header$content$content$data)
         style <- create_style(table_contents, last_header_row, col_i, "header")
-        row_height <- calc_row_height(table_contents[["header"]][["styles"]][["text"]][["font.size"]][["data"]][last_header_row])
+        row_height <- calc_row_height(table_contents$header$styles$text$font.size$data[last_header_row])
         openxlsx::setRowHeights(workbook, sheet, row_i, row_height)
-      } else if (row_i == xlsx_length && table_contents$has_sum_row) {
-          # Om vi har kommit till sista raden och det finns en summarad så hämtar vi format därifrån
-          style <- create_style(table_contents, 1, col_i, "footer")
-          row_height <- calc_row_height(as.vector(table_contents[["footer"]][["styles"]][["text"]][["font.size"]][["data"]])[1])
-          openxlsx::setRowHeights(workbook, sheet, row_i, row_height)
+      } else if ( row_i >= xlsx_length - table_contents$footer_rows + 1) {
+
+        # Get the right footer row index for each time we pass a footer row, starts at 1 and adds up for each row
+        footer_i <- seq(table_contents$footer_rows, 1, by = -1)[xlsx_length - row_i + 1]
+
+        # Create the style
+        style <- create_style(table_contents, footer_i, col_i, "footer")
+        # Get the largest font size from each row so we calculate row height correctly
+
+        if (col_i == 1) { 
+          row_height <- max(calc_row_height(as.vector(table_contents$footer$styles$text$font.size$data[footer_i,])))
+          openxlsx::setRowHeights(workbook, sheet, footer_i, row_height)
+        }
+
       } else {
 
         # Om vi flaggat för att vi vill merga celler med kategoriska variabler och det är en factor så sätter vi igång
-        if (merge_cells && inherits(table_contents[["body"]][["dataset"]][[col_i]], c("factor"))) {
+        if (merge_cells && inherits(table_contents$body$dataset[[col_i]], c("factor"))) {
 
           # Om det aktuella värdet i loopen är detsamma som föregående värde och inte utgör första raden i kolumnen
-          if (table_contents[["body"]][["dataset"]][[body_row, col_i]] == previous_value && body_row != 1) {
+          if (table_contents$body$dataset[[body_row, col_i]] == previous_value && body_row != 1) {
             value_counter <- value_counter + 1
             # Om det är sista raden i kolumnen och antalet värden hittills är fler än en så mergar vi
             # Eller så är vi på näst sista raden och har en summarad längst ned, då mergar vi också.
-            if ((row_i == xlsx_length && value_counter > 1) || ((row_i == xlsx_length - 1) && table_contents$has_sum_row)) {
+            if ((row_i == xlsx_length && value_counter > 1) || (row_i == xlsx_length - table_contents$footer_rows)) {
               openxlsx::mergeCells(workbook, sheet, cols = col_i, rows = merge_start_row:row_i)
             }
             # Om det däremot är ett nytt värde jämfört med föregående samt att antalsräknaren överstiger 1
-          } else if (table_contents[["body"]][["dataset"]][[body_row, col_i]] != previous_value && value_counter > 1) {
+          } else if (table_contents$body$dataset[[body_row, col_i]] != previous_value && value_counter > 1) {
             # Då mergar vi celler igen, från den rad vi stYear på minus 1 (och från den sparade startraden - merge_start_row)
             openxlsx::mergeCells(workbook, sheet, cols = col_i, rows = merge_start_row:(row_i - 1))
             # Vi sätter föregående värde till det aktuella värdet
-            previous_value <- table_contents[["body"]][["dataset"]][[body_row, col_i]]
+            previous_value <- table_contents$body$dataset[[body_row, col_i]]
             # Vi återställer räknaren till en etta
             value_counter <- 1
             # Och vi sätter startraden för merge till nuvarande rad
             merge_start_row <- row_i
           } else {
             # I alla andra fall så nollställer vi bara allt utan att göra något och gYear vidare
-            previous_value <- table_contents[["body"]][["dataset"]][[body_row, col_i]]
+            previous_value <- table_contents$body$dataset[[body_row, col_i]]
             value_counter <- 1
             merge_start_row <- row_i
           }
@@ -1109,10 +1144,12 @@ add_style <- function(workbook, sheet, table_contents, caption_size, merge_cells
         # För att applicera style på rader i body utgYear vi från body_row istället för row_i (annars hamnar vi utanför bounds)
         style <- create_style(table_contents, body_row, col_i, "body")
 
-        row_height <- calc_row_height(table_contents[["body"]][["styles"]][["text"]][["font.size"]][["data"]][body_row])
-
-        # Obs, row_i måste användas för att pricka "rätt" cell i Excel
-        openxlsx::setRowHeights(workbook, sheet, row_i, row_height)
+        # Only set row height when passing the row the first time
+        if (col_i == 1) { 
+          row_height <- max(calc_row_height(table_contents$body$styles$text$font.size$data[body_row,]))
+          # Obs, row_i måste användas för att pricka "rätt" cell i Excel
+          openxlsx::setRowHeights(workbook, sheet, row_i, row_height)
+        }
 
         # Och lägg på en rad till nästa runda
         body_row <- body_row + 1
@@ -1197,7 +1234,7 @@ ivo_flextable_to_xlsx <- function(tables, filename = "flextable_ex", format = TR
 
   # Sätter namn på tabellerna om de saknar
   if (is.null(names(tables))) {
-    names(tables) <- paste0("Blad", as.character(seq(1, length(tables))))
+    names(tables) <- paste0("Sheet", as.character(seq(1, length(tables))))
   }
 
   # Om vi har fått en lista med Flextables att skriva ut så loopar
@@ -1210,7 +1247,7 @@ ivo_flextable_to_xlsx <- function(tables, filename = "flextable_ex", format = TR
       # Kontrollerar om det specifika namnet för tabellen
       # lämnats blankt. Då fyller vi på med namnet "Blad <i>"
       if (is.na(names(tables[i])) || names(tables[i]) == "") {
-        sheet_name <- paste0("Blad", i)
+        sheet_name <- paste0("Sheet", i)
       } else {
         sheet_name <- names(tables[i])
       }
@@ -1235,11 +1272,11 @@ ivo_flextable_to_xlsx <- function(tables, filename = "flextable_ex", format = TR
     # Om det är en enskild flextable så lägger vi till den.
     table_contents <- create_table_contents(tables)
 
-    add_sheet(workbook, "Blad1", table_contents)
-    if (format) add_style(workbook, "Blad1", table_contents, caption_size, merge_cells)
-    set_colwidths(workbook, table_contents, "Blad1", colwidths)
+    add_sheet(workbook, "Sheet1", table_contents)
+    if (format) add_style(workbook, "Sheet1", table_contents, caption_size, merge_cells)
+    set_colwidths(workbook, table_contents, "Sheet1", colwidths)
 
-    if (!gridlines) openxlsx::showGridLines(workbook, "Blad1", showGridLines = FALSE)
+    if (!gridlines) openxlsx::showGridLines(workbook, "Sheet1", showGridLines = FALSE)
 
   }
 
