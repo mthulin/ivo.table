@@ -37,7 +37,9 @@ test_that("output is not different from snapshot", {
     dplyr::select(homeworld, species, sex) |>
     ivo_table(extra_header = FALSE) |> 
     flextable::add_footer_row(values = "This is a footnote.",
-                            colwidths = 6)
+                            colwidths = 6) |> 
+                    flextable::font(fontname = "Arial", part = "all")
+
 
   # A 3-way table with caption, different color and sums
   test_tbl4 <- test_df |>
@@ -52,7 +54,8 @@ test_that("output is not different from snapshot", {
                     value = flextable::as_paragraph(c(
                       "Some remark.",
                       "Some comment.")),
-                    ref_symbols = c("a", "b"))
+                    ref_symbols = c("a", "b")) |> 
+                    flextable::font(fontname = "Arial", part = "all")
 
   # A 4-way table with a highlighted cell, col sums, footnote and no extra header
   test_tbl6 <- test_df |>
@@ -61,7 +64,8 @@ test_that("output is not different from snapshot", {
     flextable::footnote(i = 2, j = 2,
                 value = flextable::as_paragraph(c(
                   "Some comment.")),
-                ref_symbols = "a")
+                ref_symbols = "a") |> 
+                flextable::font(fontname = "Arial", part = "all")
 
   # A masked 3-way table
   test_tbl7 <- test_df |>
@@ -72,7 +76,8 @@ test_that("output is not different from snapshot", {
                       "Some remark.",
                       "Some comment.")),
                     ref_symbols = c("a", "b"),
-                    part = "header")
+                    part = "header") |> 
+                    flextable::font(fontname = "Arial", part = "all")
 
 
   # A 2-way table with sums inga mergade cieller, inklusive summor och med gridlines
