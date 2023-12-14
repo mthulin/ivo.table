@@ -38,7 +38,7 @@ test_that("output is not different from snapshot", {
     ivo_table(extra_header = FALSE)
 
   # A 3-way table with caption, different color and sums
-  test_tbl4 <- dplyr::starwars |>
+  test_tbl4 <- test_df |>
     dplyr::select(homeworld, species, sex) |>
     ivo_table(caption = "Sums and a different color", color = "orange", rowsums = TRUE, colsums = TRUE)
 
@@ -48,7 +48,7 @@ test_that("output is not different from snapshot", {
     ivo_table(caption = "A different color than default", color = "orange", rowsums = TRUE)
 
   # A 4-way table with a highlighted cell, col sums and no extra header
-  test_tbl6 <- dplyr::starwars |>
+  test_tbl6 <- test_df |>
     dplyr::select(homeworld, species, sex) |>
     ivo_table(caption = "A highlighted cell", highlight_cols = 2, highlight_rows = 4, colsums = TRUE, extra_header = FALSE)
 
