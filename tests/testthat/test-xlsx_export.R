@@ -32,10 +32,14 @@ test_that("output is not different from snapshot", {
     dplyr::select(homeworld, species, sex) |>
     ivo_table(extra_header = FALSE, caption = "This is a caption that is fairly long so that we can properly evaluate the results in cases such as this one")
 
-  # A 3-way table with no caption
+  # A 3-way table with a note at the end of the table and no caption
   test_tbl3 <- test_df |>
     dplyr::select(homeworld, species, sex) |>
-    ivo_table(extra_header = FALSE)
+    ivo_table(extra_header = FALSE) |> 
+    flextable::add_footer_row(values = "This is a footnote.",
+                            colwidths = 6) |> 
+                    flextable::font(fontname = "Arial", part = "all")
+
 
   # A 3-way table with caption, different color and sums
   test_tbl4 <- test_df |>
@@ -45,17 +49,36 @@ test_that("output is not different from snapshot", {
   # A 4-way table in a different color and row sums
   test_tbl5 <- test_df |>
     dplyr::select(homeworld, eye_color, gender) |>
-    ivo_table(caption = "A different color than default", color = "orange", rowsums = TRUE)
+    ivo_table(caption = "A different color than default with two footnotes in cells", color = "orange", rowsums = TRUE) |> 
+    flextable::footnote(i = c(1, 3), j = c(1, 2),
+                    value = flextable::as_paragraph(c(
+                      "Some remark.",
+                      "Some comment.")),
+                    ref_symbols = c("a", "b")) |> 
+                    flextable::font(fontname = "Arial", part = "all")
 
-  # A 4-way table with a highlighted cell, col sums and no extra header
+  # A 4-way table with a highlighted cell, col sums, footnote and no extra header
   test_tbl6 <- test_df |>
     dplyr::select(homeworld, species, sex) |>
-    ivo_table(caption = "A highlighted cell", highlight_cols = 2, highlight_rows = 4, colsums = TRUE, extra_header = FALSE)
+    ivo_table(caption = "A highlighted cell", highlight_cols = 2, highlight_rows = 4, colsums = TRUE, extra_header = FALSE) |> 
+    flextable::footnote(i = 2, j = 2,
+                value = flextable::as_paragraph(c(
+                  "Some comment.")),
+                ref_symbols = "a") |> 
+                flextable::font(fontname = "Arial", part = "all")
 
   # A masked 3-way table
   test_tbl7 <- test_df |>
     dplyr::select(homeworld, species, gender) |>
-    ivo_table_masked(caption = "A masked table")
+    ivo_table_masked(caption = "A masked table with footnotes in header cells") |> 
+    flextable::footnote(i = 2, j = c(1, 3),
+                    value = flextable::as_paragraph(c(
+                      "Some remark.",
+                      "Some comment.")),
+                    ref_symbols = c("a", "b"),
+                    part = "header") |> 
+                    flextable::font(fontname = "Arial", part = "all")
+
 
   # A 2-way table with sums inga mergade cieller, inklusive summor och med gridlines
   test_tbl8 <- test_df |>

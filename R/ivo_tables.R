@@ -793,8 +793,8 @@ create_table_contents <- function(flxtbl) {
       top_var_label = get_top_var_label(flxtbl),
       push_top_var = get_push_top_var(flxtbl),
       header = flxtbl$header,
-      body = flxtbl$body,
       footer = flxtbl$footer,
+      body = flxtbl$body,
       footer_rows = nrow(flxtbl$footer$dataset),
       has_sum_col = as.integer(!is.null(flxtbl$body$dataset$Total)))
 }
@@ -818,6 +818,51 @@ get_push_top_var <- function(table_contents) {
     unname() |>  # Inga namn i vektorn, bara värden
     stringr::str_subset(".+", negate = TRUE) |> # Bara blanka strings "" som förekommer
     length() + 1 # För att fånga in antalet kolumner att skippa. +1 för att det ska bli rätt.
+}
+
+get_ref_symbols <- function(table_contents, part) {
+  # Check if there are any reference symbols
+  txt_values <- apply(table_contents[[part]]$content$content$data, c(1, 2), function(df) unlist(lapply(df, function(x) length(x$txt) > 1)))
+  # Get the x, y coordinates so we can extract the values and put in correct place
+  note_coords <- which(txt_values, arr.ind = T)
+  # If there are coordinates we use those to extract the contents
+  if (length(note_coords) > 0) {
+    for (i in 1:nrow(note_coords)) {
+        row_i <- note_coords[i, 1]
+        col_i <- note_coords[i, 2]
+        
+        # This is where we find the vector, which is extactly of length 2 (1 for value, 1 for ref symbol)
+        txt <- table_contents[[part]]$content$content$data[[row_i, col_i]]$txt
+        # Turn it into a string where we wrap the ref symbol in parenthesis
+        new_txt <- paste0(txt[1], " (", txt[2], ")")
+        
+        switch(part,
+        "footer" = {
+          # Reverse the order of text
+          new_txt <- paste0("(", txt[1], ") ", txt[2])
+          table_contents$footer$dataset[[row_i, col_i]] <- new_txt
+        },
+        "header" = {
+          # If the reference symbol is inside the header, we set the colname for both
+          # the body and footer dataset so that we can bind them later
+          names(table_contents$body$dataset)[col_i] <- new_txt
+          names(table_contents$footer$dataset)[col_i] <- new_txt
+        },
+        "body" = {
+          # If it's a categorical variable it will be stored as factor, so we need to add the new "value" to its levels
+          if (inherits(table_contents[[part]]$dataset[[row_i, col_i]], "factor")) {
+              levels(table_contents[[part]]$dataset[[col_i]]) <- c(levels(table_contents[[part]]$dataset[[col_i]]), new_txt)
+          }
+          # If it's in the body we just target the x,y coordinate in the table and adjust the value
+          table_contents[[part]]$dataset[[row_i, col_i]] <- new_txt
+        })
+    }
+  }
+  return(table_contents)
+}
+
+get_footnotes <- function(table_contents, part) {
+
 }
 
 # Lägg till tabelldata till ett namnat blad
@@ -851,48 +896,40 @@ add_sheet <- function(workbook, sheet_name, table_contents) {
         # men vi måste räknar bort om det finns en summa-kolumn att förhålla sig till
         start_col <- table_contents$push_top_var - table_contents$has_sum_col
       },
+      "footer" = {
+        if (table_contents$footer_rows > 0) {
+          # Make sure to clear all columns past the first one, since they contain only repeated reference symbols
+          # If there's a sum row, we need to avoid clearing that.
+          if (table_contents$footer$dataset[1, 1] == "Total") {
+            table_contents$footer$dataset[-1,-1] <- NA 
+          } else { 
+            table_contents$footer$dataset[-1] <- NA
+          }
+          table_contents <- get_ref_symbols(table_contents, item)
+        }
+      },
+      "header" = {
+        # Check if the header contains any reference symbols
+        if (table_contents$footer_rows > 0) table_contents <- get_ref_symbols(table_contents, item)
+      },
       "body" = {
         # Body behöver vi packa upp och lägga till summa-raden som
         # finns i "footer".
+        if (table_contents$footer_rows > 0) table_contents <- get_ref_symbols(table_contents, item)
 
-        if (table_contents$footer_rows > 0) {
-          # Check if there are any reference symbols
-          txt_values <- apply(table_contents[[item]]$content$content$data, c(1, 2), function(df) unlist(lapply(df, function(x) length(x$txt) > 1)))
-          # Get the x, y coordinates so we can extract the values and put in correct place
-          note_coords <- which(txt_values, arr.ind = T)
-          # If there are coordinates we use those to extract the contents
-          if (length(note_coords) > 0) {
-            for (i in 1:nrow(note_coords)) {
-                row_i <- note_coords[i, 1]
-                col_i <- note_coords[i, 2]
-                
-                # This is where we find the vector, which is extactly of length 2 (1 for value, 1 for ref symbol)
-                txt <- table_contents$body$content$content$data[[row_i, col_i]]$txt
-                # Turn it into a string where we wrap the ref symbol in parenthesis
-                new_txt <- paste0(txt[1], " (", txt[2], ")")
-                # If it's a categorical variable it will be stored as factor, so we need to add the new "value" to its levels
-                if (inherits(table_contents$body$dataset[[row_i, col_i]], "factor")) {
-                    levels(table_contents$body$dataset[[col_i]]) <- c(levels(table_contents$body$dataset[[col_i]]), new_txt)
-                }
-                # Then we add the adjustd value itself to the dataset
-                table_contents$body$dataset[[row_i, col_i]] <- new_txt
-            }
-          }
-          contents <- rbind(table_contents[[item]]$dataset, table_contents$footer$dataset)
+        contents <- rbind(table_contents[[item]]$dataset, table_contents$footer$dataset)
 
-        } else {
-          contents <- table_contents[[item]]$dataset
-        }
       },
       # Allt annat skippar vi
       next
     )
 
     # Skriv innehållet till bladet
-    openxlsx::writeData(workbook, sheet_name, contents, startRow = start_row, startCol = start_col)
+    if (exists("contents")) openxlsx::writeData(workbook, sheet_name, contents, startRow = start_row, startCol = start_col)
 
-    # För varje item så lägger vi på en startrad för nästa runda
-    start_row <- start_row + 1
+    # We add a start row for each round, except for header/footer where we only modify for reference symbols.
+    # This should be refactored at some point.
+    if (!item %in% c("header", "footer")) start_row <- start_row + 1
   }
 
 }
@@ -1097,17 +1134,14 @@ add_style <- function(workbook, sheet, table_contents, caption_size, merge_cells
         row_height <- calc_row_height(table_contents$header$styles$text$font.size$data[last_header_row])
         openxlsx::setRowHeights(workbook, sheet, row_i, row_height)
       } else if ( row_i >= xlsx_length - table_contents$footer_rows + 1) {
-
         # Get the right footer row index for each time we pass a footer row, starts at 1 and adds up for each row
         footer_i <- seq(table_contents$footer_rows, 1, by = -1)[xlsx_length - row_i + 1]
-
         # Create the style
         style <- create_style(table_contents, footer_i, col_i, "footer")
         # Get the largest font size from each row so we calculate row height correctly
-
         if (col_i == 1) { 
           row_height <- max(calc_row_height(as.vector(table_contents$footer$styles$text$font.size$data[footer_i,])))
-          openxlsx::setRowHeights(workbook, sheet, footer_i, row_height)
+          openxlsx::setRowHeights(workbook, sheet, row_i, row_height)
         }
 
       } else {
