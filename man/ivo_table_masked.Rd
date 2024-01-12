@@ -10,8 +10,10 @@ ivo_table_masked(
   cell = 5,
   extra_header = TRUE,
   exclude_missing = FALSE,
+  missing_string = "(Missing)",
   colsums = FALSE,
   rowsums = FALSE,
+  sums_string = "Total",
   caption = NA,
   highlight_cols = NULL,
   highlight_rows = NULL,
@@ -30,9 +32,13 @@ ivo_table_masked(
 
 \item{exclude_missing}{Whether to exclude missing values from the table. Defaults to FALSE.}
 
+\item{missing_string}{A string used to indicate missing values. Defaults to "(Missing)".}
+
 \item{colsums}{A logical indicating whether the sum of each column should be computed. Defaults to FALSE.}
 
 \item{rowsums}{A logical indicating whether the sum of each row should be computed. Defaults to FALSE.}
+
+\item{sums_string}{A string that is printed in the column/row where row/column sums are shown. Defaults to "Total".}
 
 \item{caption}{An optional string containing a table caption.}
 
