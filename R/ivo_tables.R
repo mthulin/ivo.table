@@ -1230,18 +1230,19 @@ add_style <- function(workbook, sheet, table_contents, caption_size, merge_cells
 #' summarise(mean_height = mean(height)) |>
 #' flextable()
 #'
+#' # Uncomment the examples below to run them.
 #' # Only one flextable
-#' ivo_flextable_to_xlsx(tbl1, "Flextable_test1.xlsx", format = FALSE, colwidths = "auto")
+#' #ivo_flextable_to_xlsx(tbl1, "Flextable_test1.xlsx", format = FALSE, colwidths = "auto")
 #'
 #' # Two tables, no named sheets
-#' ivo_flextable_to_xlsx(list(tbl1, tbl2), "Flextable_test2.xlsx")
+#' #ivo_flextable_to_xlsx(list(tbl1, tbl2), "Flextable_test2.xlsx")
 #'
 #' # Two tables, with named sheets
-#' ivo_flextable_to_xlsx(
-#'    list("Planets" = tbl1, "Mean height" = tbl2),
-#'    "Flextable_test3.xlsx",
-#'    colwidths = "auto"
-#'    )
+#' #ivo_flextable_to_xlsx(
+#' #   list("Planets" = tbl1, "Mean height" = tbl2),
+#' #   "Flextable_test3.xlsx",
+#' #   colwidths = "auto"
+#' #   )
 #' @export
 ivo_flextable_to_xlsx <- function(tables, filename = "flextable_ex", sums_string = "Total", format = TRUE, colwidths = "guess", caption_size = 14, merge_cells = TRUE, gridlines = FALSE) {
 
