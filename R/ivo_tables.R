@@ -12,9 +12,14 @@ ivo_add_extra_header <- function(df, name_v4, ncol_v4, kway = 2, add = TRUE, row
   } else { df }
 }
 
-ivo_add_extra_header_1way <- function(df, name_v4, ncol_v4, add = TRUE)
+ivo_add_extra_header_1way <- function(df, name_v4, ncol_v4, add = TRUE, rowsums = FALSE)
 {
-  if(add) { df |> flextable::add_header_row(values = c(name_v4), colwidths = c(ncol_v4))} else { df }
+  if(add) {
+    if(rowsums) { 
+      flextable::add_header_row(df, values = c(name_v4, ""), colwidths = c(ncol_v4, 1)) } else {
+      flextable::add_header_row(df, values = c(name_v4), colwidths = c(ncol_v4))
+    }
+  } else { df }
 }
 
 ivo_excl_missing <- function(df, exclude_missing = FALSE, missing_string = "(Missing)")
@@ -30,7 +35,7 @@ ivo_num_sum <- function(x)
   return(x)
 }
 
-ivo_add_row_sums <- function(df, new_row, colsums)
+ivo_add_col_sums <- function(df, new_row, colsums)
 {
   if(colsums) { flextable::add_footer(df, values = new_row) } else { df }
 }
@@ -101,7 +106,7 @@ ivo_tab2_step2 <- function(df, v1, v4, extra_header, colsums, rowsums, percent_b
   df |>
     flextable::regulartable() |>
     ivo_add_extra_header(name_v4, ncol_v4, 2, add = extra_header, rowsums) |>
-    ivo_add_row_sums(new_row, colsums) |>
+    ivo_add_col_sums(new_row, colsums) |>
     flextable::autofit()
 }
 
@@ -156,7 +161,7 @@ ivo_tab3_step2 <- function(df, v1, v3, v4, extra_header, colsums, rowsums, perce
   df |>
     flextable::regulartable() |>
     ivo_add_extra_header(name_v4, ncol_v4, 3, add = extra_header, rowsums) |>
-    ivo_add_row_sums(new_row, colsums) |>
+    ivo_add_col_sums(new_row, colsums) |>
     flextable::merge_v(j = name_v1) |>
     flextable::autofit()
 }
@@ -212,7 +217,7 @@ ivo_tab4_step2 <- function(df, v1, v2, v3, v4, extra_header, colsums, rowsums, p
   df |>
     flextable::regulartable() |>
     ivo_add_extra_header(name_v4, ncol_v4, 4, add = extra_header, rowsums) |>
-    ivo_add_row_sums(new_row, colsums) |>
+    ivo_add_col_sums(new_row, colsums) |>
     flextable::merge_v(j = name_v1) |>
     flextable::merge_v(j = name_v2)  |>
     flextable::autofit()
@@ -222,9 +227,9 @@ ivo_tab4_step2 <- function(df, v1, v2, v3, v4, extra_header, colsums, rowsums, p
 # _____________________________________________________________
 # IVO internal table functions to create correct ivo_table()----
 
-ivo_table_1way <- function(df, varleft, extra_header = TRUE, exclude_missing = FALSE, missing_string = "(Missing)", caption = NA, highlight_cols = NULL, highlight_rows = NULL, percent_by = NA, color = "darkgreen", font_name = "Arial", long_table = FALSE)
+ivo_table_1way <- function(df, varleft, extra_header = TRUE, exclude_missing = FALSE, missing_string = "(Missing)", colsums = colsums, rowsums = rowsums, caption = NA, highlight_cols = NULL, highlight_rows = NULL, percent_by = NA, color = "darkgreen", font_name = "Arial", long_table = FALSE, sums_string = "Total")
 {
-
+  Total <- NULL
   ncol_v4 <- df |> dplyr::pull({{varleft}}) |> unique() |> length()
   name_v4 <- df |> dplyr::select({{varleft}}) |> names()
 
@@ -246,10 +251,15 @@ ivo_table_1way <- function(df, varleft, extra_header = TRUE, exclude_missing = F
                             total = NULL,
                             tot = NULL)
       df |> ivo_to_percent(k = 2, margin = perc_margin) -> df
-      new_row <- NA }
+      new_row <- NA } else {
+          if (rowsums) message("It looks like you want sums for your table. Use colsums instead of rowsums for 1-way tables in long format.")
+          new_row <- c(apply(df, 2, ivo_num_sum), sums_string)
+          names(new_row)[length(new_row)] <- names(df)[1]
+        }
 
 
     df |> flextable::regulartable() |>
+    ivo_add_col_sums(new_row, colsums) |>
     flextable::autofit() |>
     ivo_flextable_theme(1, rowsums = FALSE, caption, highlight_cols, highlight_rows, color, font_name) -> df } else {
       df |> dplyr::select({{varleft}}) |>
@@ -269,20 +279,23 @@ ivo_table_1way <- function(df, varleft, extra_header = TRUE, exclude_missing = F
                               total = NULL,
                               tot = NULL)
         df |> ivo_to_percent(k = 1, margin = perc_margin) -> df
-        new_row <- NA }
-
+        new_row <- NA } else {
+          if (colsums) message("It looks like you want sums for your table. Use rowsums instead of colsums for 1-way tables.")
+          df$Total <- unlist(apply(df, 1, ivo_num_sum))
+          if(!rowsums) { df |> dplyr::select(-Total) -> df }
+        }
         df |> flextable::regulartable() |>
-        ivo_add_extra_header_1way(name_v4, ncol_v4, extra_header) |>
+        ivo_add_extra_header_1way(name_v4, ncol_v4, extra_header, rowsums) |>
         flextable::autofit() |>
-        ivo_flextable_theme(1, rowsums = FALSE, caption, highlight_cols, highlight_rows, color, font_name) -> df
+        ivo_flextable_theme(1, rowsums, caption, highlight_cols, highlight_rows, color, font_name) -> df
     }
 
   if(!is.na(percent_by)) { df |> flextable::colformat_double(decimal.mark = ",", suffix = " %", big.mark = " ") } else { df }
 }
 
 
-ivo_masked_table_1way <- function(df, varleft, cell = 5, extra_header = TRUE, exclude_missing = FALSE, missing_string = "(Missing)", caption = NA, highlight_cols = NULL, highlight_rows = NULL, color = "darkgreen", font_name = "Arial",  long_table = FALSE){
-
+ivo_masked_table_1way <- function(df, varleft, cell = 5, extra_header = TRUE, exclude_missing = FALSE, missing_string = "(Missing)", colsums = FALSE, rowsums = FALSE, caption = NA, highlight_cols = NULL, highlight_rows = NULL, color = "darkgreen", font_name = "Arial",  long_table = FALSE, sums_string = "Total"){
+  Total <- NULL
   ncol_v4 <- df |> dplyr::pull({{varleft}}) |> unique() |> length()
   name_v4 <- df |> dplyr::select({{varleft}}) |> names()
 
@@ -292,8 +305,14 @@ ivo_masked_table_1way <- function(df, varleft, cell = 5, extra_header = TRUE, ex
       stats::ftable() |>
       base::data.frame() |>
       ivo_table_add_mask(cell)  |>
-      `colnames<-`(c({{varleft}}, "Count")) |>
-      flextable::regulartable() |>
+      `colnames<-`(c({{varleft}}, "Count")) -> df
+
+      if (rowsums) message("It looks like you want sums for your table. Use colsums instead of rowsums for 1-way tables in long format.")
+      new_row <- c(apply(df, 2, ivo_num_sum), sums_string)
+          names(new_row)[length(new_row)] <- names(df)[1]
+      
+      df |> flextable::regulartable() |>
+      ivo_add_col_sums(new_row, colsums) |>
       flextable::autofit() |>
       ivo_flextable_theme(1, rowsums = FALSE, caption, highlight_cols, highlight_rows, color, font_name) } else {
         df |> dplyr::select({{varleft}}) |> ivo_excl_missing(exclude_missing, missing_string) |>
@@ -301,11 +320,16 @@ ivo_masked_table_1way <- function(df, varleft, cell = 5, extra_header = TRUE, ex
         base::data.frame() |>
         ivo_table_add_mask(cell)  |>
         `colnames<-`(c({{varleft}}, "Freq")) |>
-        tidyr::pivot_wider(names_from = {{varleft}} , values_from = "Freq") |>
-        flextable::regulartable() |>
-        ivo_add_extra_header_1way(name_v4, ncol_v4, extra_header) |>
+        tidyr::pivot_wider(names_from = {{varleft}} , values_from = "Freq") -> df
+        
+        if (colsums) message("It looks like you want sums for your table. Use rowsums instead of colsums for 1-way tables.")
+        df$Total <- unlist(apply(df, 1, ivo_num_sum))
+        if(!rowsums) { df |> dplyr::select(-Total) -> df }
+
+        df |> flextable::regulartable() |>
+        ivo_add_extra_header_1way(name_v4, ncol_v4, extra_header, rowsums) |>
         flextable::autofit() |>
-        ivo_flextable_theme(1, rowsums = FALSE, caption, highlight_cols, highlight_rows, color, font_name)
+        ivo_flextable_theme(1, rowsums, caption, highlight_cols, highlight_rows, color, font_name)
     }
 
 
@@ -675,7 +699,7 @@ ivo_table <- function(df, extra_header = TRUE, exclude_missing = FALSE, missing_
 
   # Number of variables in df
   if (length(var_name) == 1) {
-    ivo_table_1way(df = df, varleft = var_name[1], extra_header = extra_header, exclude_missing = exclude_missing, missing_string = missing_string, caption = caption, highlight_cols = highlight_cols, highlight_rows = highlight_rows, percent_by = percent_by, color = color, font_name = font_name,  long_table = long_table)
+    ivo_table_1way(df = df, varleft = var_name[1], extra_header = extra_header, exclude_missing = exclude_missing, missing_string = missing_string, colsums = colsums, rowsums = rowsums, sums_string = sums_string, caption = caption, highlight_cols = highlight_cols, highlight_rows = highlight_rows, percent_by = percent_by, color = color, font_name = font_name,  long_table = long_table)
   } else if (length(var_name) == 2) {
     ivo_table_2way(df = df, varleft = var_name[2], vartop = var_name[1], extra_header = extra_header, exclude_missing = exclude_missing, missing_string = missing_string, colsums = colsums, rowsums = rowsums, sums_string = sums_string, caption = caption, highlight_cols = highlight_cols, highlight_rows = highlight_rows, percent_by = percent_by, color = color, font_name = font_name,  remove_zero_rows = remove_zero_rows)
   } else if (length(var_name) == 3) {
@@ -784,7 +808,7 @@ ivo_table_masked <- function(df, cell = 5, extra_header = TRUE, exclude_missing 
 
   # Number of variables in df
   if (length(var_name) == 1) {
-    ivo_masked_table_1way(df = df, varleft = var_name[1], cell = cell, extra_header = extra_header, exclude_missing = exclude_missing, missing_string = missing_string, caption = caption, highlight_cols = highlight_cols, highlight_rows = highlight_rows, color = color, font_name = font_name, long_table = long_table)
+    ivo_masked_table_1way(df = df, varleft = var_name[1], cell = cell, extra_header = extra_header, exclude_missing = exclude_missing, missing_string = missing_string, colsums = colsums, rowsums = rowsums, sums_string = sums_string, caption = caption, highlight_cols = highlight_cols, highlight_rows = highlight_rows, color = color, font_name = font_name, long_table = long_table)
   } else if (length(var_name) == 2) {
     ivo_masked_table_2way(df = df, varleft = var_name[2], vartop = var_name[1], cell = cell, extra_header = extra_header, exclude_missing = exclude_missing, missing_string = missing_string, colsums = colsums, rowsums = rowsums, sums_string = sums_string, caption = caption, highlight_cols = highlight_cols, highlight_rows = highlight_rows, color = color, font_name = font_name, remove_zero_rows = remove_zero_rows)
   } else if (length(var_name) == 3) {
@@ -837,12 +861,12 @@ get_ref_symbols <- function(table_contents, part) {
     for (i in 1:nrow(note_coords)) {
         row_i <- note_coords[i, 1]
         col_i <- note_coords[i, 2]
-
+        
         # This is where we find the vector, which is extactly of length 2 (1 for value, 1 for ref symbol)
         txt <- table_contents[[part]]$content$content$data[[row_i, col_i]]$txt
         # Turn it into a string where we wrap the ref symbol in parenthesis
         new_txt <- paste0(txt[1], " (", txt[2], ")")
-
+        
         switch(part,
         "footer" = {
           # Reverse the order of text
@@ -1015,7 +1039,7 @@ set_colwidths <- function(workbook, table_contents, sheet, colwidths) {
               colwidths <- append(colwidths, width)
 
             }
-
+        
             openxlsx::setColWidths(workbook, sheet, cols = seq_along(table_contents$body$dataset), widths = colwidths)
          },
          "auto" = {
@@ -1146,7 +1170,7 @@ add_style <- function(workbook, sheet, table_contents, caption_size, merge_cells
         # Create the style
         style <- create_style(table_contents, footer_i, col_i, "footer")
         # Get the largest font size from each row so we calculate row height correctly
-        if (col_i == 1) {
+        if (col_i == 1) { 
           row_height <- max(calc_row_height(as.vector(table_contents$footer$styles$text$font.size$data[footer_i,])))
           openxlsx::setRowHeights(workbook, sheet, row_i, row_height)
         }
@@ -1186,7 +1210,7 @@ add_style <- function(workbook, sheet, table_contents, caption_size, merge_cells
         style <- create_style(table_contents, body_row, col_i, "body")
 
         # Only set row height when passing the row the first time
-        if (col_i == 1) {
+        if (col_i == 1) { 
           row_height <- max(calc_row_height(table_contents$body$styles$text$font.size$data[body_row,]))
           # Obs, row_i måste användas för att pricka "rätt" cell i Excel
           openxlsx::setRowHeights(workbook, sheet, row_i, row_height)
