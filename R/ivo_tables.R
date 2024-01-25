@@ -15,7 +15,7 @@ ivo_add_extra_header <- function(df, name_v4, ncol_v4, kway = 2, add = TRUE, row
 ivo_add_extra_header_1way <- function(df, name_v4, ncol_v4, add = TRUE, rowsums = FALSE)
 {
   if(add) {
-    if(rowsums) { 
+    if(rowsums) {
       flextable::add_header_row(df, values = c(name_v4, ""), colwidths = c(ncol_v4, 1)) } else {
       flextable::add_header_row(df, values = c(name_v4), colwidths = c(ncol_v4))
     }
@@ -24,7 +24,15 @@ ivo_add_extra_header_1way <- function(df, name_v4, ncol_v4, add = TRUE, rowsums 
 
 ivo_excl_missing <- function(df, exclude_missing = FALSE, missing_string = "(Missing)")
 {
-  if(!exclude_missing) { df[is.na(df)] <- missing_string }
+  if(!exclude_missing) {
+    for(i in 1:ncol(df)){
+      if(is.factor(df[,i]) & sum(is.na(df[,i]))>0) {
+        levs <- levels(df[,i])
+        df[,i] <- as.character(df[,i])
+        df[is.na(df[,i]),i] <- "6049122418972891471204127890512XY"
+        df[,i] <- factor(df[,i], levels = c(levs, "6049122418972891471204127890512XY"), labels = c(levs, missing_string))
+      } else { df[is.na(df[,i]), i] <- missing_string }
+    }}
   return(df)
 }
 
@@ -66,7 +74,7 @@ ivo_tab2_step1 <- function(df, v1, v4, exclude_missing, missing_string)
   # Filter the data frame and create a frequency table
   df |> dplyr::select({{v1}}, {{v4}}) |>
     ivo_excl_missing(exclude_missing, missing_string) |>
-    stats::ftable() |>
+    stats::ftable(exclude=NULL) |>
     base::data.frame() |>
     `colnames<-`(c({{v1}}, {{v4}}, "Freq"))
 }
@@ -114,14 +122,14 @@ ivo_tab2_step2 <- function(df, v1, v4, extra_header, colsums, rowsums, percent_b
 ivo_tab3_step1 <- function(df, v1, v3, v4, exclude_missing, missing_string)
 {
   # Filter the data frame and create a frequency table
-  df |> dplyr::select({{v1}}, {{v3}}, {{v4}}) |>
+  df |> dplyr::select({{v4}}, {{v1}}, {{v3}}) |>
     ivo_excl_missing(exclude_missing, missing_string) |>
-    stats::ftable() |>
-    base::data.frame() |>
+    stats::ftable(exclude=NULL) |>
+    base::data.frame() #|>
     # `colnames<-`(c({{v1}}, {{v3}}, {{v4}}, "Freq")) -> df
     # df[order(df[,1]),]
-    `colnames<-`(c({{v1}}, {{v3}}, {{v4}}, "Freq")) |>
-    dplyr::arrange(.data[[v1]])
+    #`colnames<-`(c({{v1}}, {{v3}}, {{v4}}, "Freq")) |>
+    #dplyr::arrange(.data[[v4]])
 }
 
 ivo_tab3_step2 <- function(df, v1, v3, v4, extra_header, colsums, rowsums, percent_by, remove_zero_rows, sums_string)
@@ -133,7 +141,8 @@ ivo_tab3_step2 <- function(df, v1, v3, v4, extra_header, colsums, rowsums, perce
   name_v1 <- df |> dplyr::select({{v1}}) |> names()
 
   # Format the table
-  df |> tidyr::pivot_wider(names_from = {{v4}} , values_from = "Freq")  -> df
+  df |> tidyr::pivot_wider(names_from = {{v4}} , values_from = "Freq") |>
+    dplyr::arrange(.data[[v1]])  -> df
 
   # Show numbers as percentages if requested:
   if(!is.na(percent_by)) {
@@ -170,12 +179,11 @@ ivo_tab3_step2 <- function(df, v1, v3, v4, extra_header, colsums, rowsums, perce
 ivo_tab4_step1 <- function(df, v1, v2, v3, v4, exclude_missing, missing_string)
 {
   # Filter the data frame and create a frequency table
-  df |> dplyr::select({{v1}}, {{v2}}, {{v3}}, {{v4}}) |>
+  df |> dplyr::select({{v4}}, {{v1}}, {{v2}}, {{v3}}) |>
     ivo_excl_missing(exclude_missing, missing_string) |>
-    stats::ftable() |>
-    base::data.frame() |>
-    `colnames<-`(c({{v1}}, {{v2}}, {{v3}}, {{v4}}, "Freq")) |>
-    dplyr::arrange(.data[[v1]], .data[[v2]])
+    stats::ftable(exclude=NULL) |>
+    base::data.frame() #|>
+    #`colnames<-`(c({{v1}}, {{v2}}, {{v3}}, {{v4}}, "Freq"))
   # -> df
   #   df[do.call(order, list(df[,1], df[,2])),]
 }
@@ -190,7 +198,8 @@ ivo_tab4_step2 <- function(df, v1, v2, v3, v4, extra_header, colsums, rowsums, p
   name_v1 <- df |> dplyr::select({{v1}}) |> names()
 
   # Format the table
-  df |> tidyr::pivot_wider(names_from = {{v4}} , values_from = "Freq") -> df
+  df |> tidyr::pivot_wider(names_from = {{v4}} , values_from = "Freq") |>
+    dplyr::arrange(.data[[v1]], .data[[v2]]) -> df
 
   # Show numbers as percentages if requested:
   if(!is.na(percent_by)) {
@@ -237,7 +246,7 @@ ivo_table_1way <- function(df, varleft, extra_header = TRUE, exclude_missing = F
   if(long_table) {
   df |> dplyr::select({{varleft}}) |>
     ivo_excl_missing(exclude_missing, missing_string) |>
-    stats::ftable() |>
+    stats::ftable(exclude=NULL) |>
     base::data.frame() |>
     `colnames<-`(c({{varleft}}, "Count")) -> df
 
@@ -264,7 +273,7 @@ ivo_table_1way <- function(df, varleft, extra_header = TRUE, exclude_missing = F
     ivo_flextable_theme(1, rowsums = FALSE, caption, highlight_cols, highlight_rows, color, font_name) -> df } else {
       df |> dplyr::select({{varleft}}) |>
         ivo_excl_missing(exclude_missing, missing_string) |>
-        stats::ftable() |>
+        stats::ftable(exclude=NULL) |>
         base::data.frame() |>
         `colnames<-`(c({{varleft}}, "Freq")) |>
         tidyr::pivot_wider(names_from = {{varleft}} , values_from = "Freq") -> df
@@ -302,7 +311,7 @@ ivo_masked_table_1way <- function(df, varleft, cell = 5, extra_header = TRUE, ex
   if(long_table) {
   df |> dplyr::select({{varleft}}) |>
       ivo_excl_missing(exclude_missing, missing_string) |>
-      stats::ftable() |>
+      stats::ftable(exclude=NULL) |>
       base::data.frame() |>
       ivo_table_add_mask(cell)  |>
       `colnames<-`(c({{varleft}}, "Count")) -> df
@@ -310,18 +319,18 @@ ivo_masked_table_1way <- function(df, varleft, cell = 5, extra_header = TRUE, ex
       if (rowsums) message("It looks like you want sums for your table. Use colsums instead of rowsums for 1-way tables in long format.")
       new_row <- c(apply(df, 2, ivo_num_sum), sums_string)
           names(new_row)[length(new_row)] <- names(df)[1]
-      
+
       df |> flextable::regulartable() |>
       ivo_add_col_sums(new_row, colsums) |>
       flextable::autofit() |>
       ivo_flextable_theme(1, rowsums = FALSE, caption, highlight_cols, highlight_rows, color, font_name) } else {
         df |> dplyr::select({{varleft}}) |> ivo_excl_missing(exclude_missing, missing_string) |>
-        stats::ftable() |>
+        stats::ftable(exclude=NULL) |>
         base::data.frame() |>
         ivo_table_add_mask(cell)  |>
         `colnames<-`(c({{varleft}}, "Freq")) |>
         tidyr::pivot_wider(names_from = {{varleft}} , values_from = "Freq") -> df
-        
+
         if (colsums) message("It looks like you want sums for your table. Use rowsums instead of colsums for 1-way tables.")
         df$Total <- unlist(apply(df, 1, ivo_num_sum))
         if(!rowsums) { df |> dplyr::select(-Total) -> df }
@@ -407,7 +416,7 @@ ivo_masked_table_4way <- function(df, varleft, varleft2, varright, vartop, cell 
 #' @encoding UTF-8
 #' @description Table masking using cell counts..
 #'
-#' @param df A data frame containing a column called "Freq", e.g. a frequency table created using \code{ftable() |> data.frame()}.
+#' @param df A data frame containing a column called "Freq", e.g. a frequency table created using \code{ftable(exclude=NULL) |> data.frame()}.
 #' @param cell The cell count at which masking should be used. Cell counts between 1 and this number will be masked. The default is 5.
 #'
 #' @return A data frame with masked cell counts.
@@ -423,7 +432,7 @@ ivo_masked_table_4way <- function(df, varleft, varleft2, varright, vartop, cell 
 #' C = sample(c("Swedish", "Norwegian", "Chilean"), 50, replace = TRUE))
 #' # With masking limit set at 7:
 #' example_data |> select(Year, A) |>
-#'   ftable() |>
+#'   ftable(exclude=NULL) |>
 #'   data.frame() |>
 #'   ivo_table_add_mask(cell = 7)
 #'
@@ -469,7 +478,7 @@ ivo_table_add_mask <- function(df, cell = 5)
 #' B = sample(c("Apples", "Oranges", "Bananas"), 50, replace = TRUE),
 #' C = sample(c("Swedish", "Norwegian", "Chilean"), 50, replace = TRUE))
 #' example_data |> select(B, A) |>
-#'   ftable() |>
+#'   ftable(exclude=NULL) |>
 #'   data.frame() |>
 #'   spread(A, Freq) |>
 #'   regulartable() |>
@@ -694,9 +703,6 @@ ivo_table <- function(df, extra_header = TRUE, exclude_missing = FALSE, missing_
     message("Dots have been replaced with spaces in the variable names.")
   }
 
-  # Convert factors to characters (required for dealing with missing values):
-  df <- apply(df, 2, as.character) |> as.data.frame()
-
   # Number of variables in df
   if (length(var_name) == 1) {
     ivo_table_1way(df = df, varleft = var_name[1], extra_header = extra_header, exclude_missing = exclude_missing, missing_string = missing_string, colsums = colsums, rowsums = rowsums, sums_string = sums_string, caption = caption, highlight_cols = highlight_cols, highlight_rows = highlight_rows, percent_by = percent_by, color = color, font_name = font_name,  long_table = long_table)
@@ -861,12 +867,12 @@ get_ref_symbols <- function(table_contents, part) {
     for (i in 1:nrow(note_coords)) {
         row_i <- note_coords[i, 1]
         col_i <- note_coords[i, 2]
-        
+
         # This is where we find the vector, which is extactly of length 2 (1 for value, 1 for ref symbol)
         txt <- table_contents[[part]]$content$content$data[[row_i, col_i]]$txt
         # Turn it into a string where we wrap the ref symbol in parenthesis
         new_txt <- paste0(txt[1], " (", txt[2], ")")
-        
+
         switch(part,
         "footer" = {
           # Reverse the order of text
@@ -1039,7 +1045,7 @@ set_colwidths <- function(workbook, table_contents, sheet, colwidths) {
               colwidths <- append(colwidths, width)
 
             }
-        
+
             openxlsx::setColWidths(workbook, sheet, cols = seq_along(table_contents$body$dataset), widths = colwidths)
          },
          "auto" = {
@@ -1170,7 +1176,7 @@ add_style <- function(workbook, sheet, table_contents, caption_size, merge_cells
         # Create the style
         style <- create_style(table_contents, footer_i, col_i, "footer")
         # Get the largest font size from each row so we calculate row height correctly
-        if (col_i == 1) { 
+        if (col_i == 1) {
           row_height <- max(calc_row_height(as.vector(table_contents$footer$styles$text$font.size$data[footer_i,])))
           openxlsx::setRowHeights(workbook, sheet, row_i, row_height)
         }
@@ -1210,7 +1216,7 @@ add_style <- function(workbook, sheet, table_contents, caption_size, merge_cells
         style <- create_style(table_contents, body_row, col_i, "body")
 
         # Only set row height when passing the row the first time
-        if (col_i == 1) { 
+        if (col_i == 1) {
           row_height <- max(calc_row_height(table_contents$body$styles$text$font.size$data[body_row,]))
           # Obs, row_i måste användas för att pricka "rätt" cell i Excel
           openxlsx::setRowHeights(workbook, sheet, row_i, row_height)
