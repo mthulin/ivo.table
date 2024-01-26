@@ -51,7 +51,7 @@ A = sample(c("Type 1", "Type 2"), 50, replace = TRUE),
 B = sample(c("Apples", "Oranges", "Bananas"), 50, replace = TRUE),
 C = sample(c("Swedish", "Norwegian", "Chilean"), 50, replace = TRUE))
 example_data |> select(B, A) |>
-  ftable() |>
+  ftable(exclude=NULL) |>
   data.frame() |>
   spread(A, Freq) |>
   regulartable() |>

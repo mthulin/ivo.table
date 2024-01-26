@@ -1,5 +1,5 @@
 # ivo.table
-This R package provides functions for easily creating nicely formatted frequency tables and contingency tables (cross-tables), that are straightforward to export to HTML or Office documents. It can do 1-way tables (wide or long), 2-way tables, 3-way tables and 4-way tables. It is based on `flextable`, and uses `openxlsx` for exporting the tables to Excel.
+This R package provides functions for easily creating nicely formatted frequency tables and contingency tables (cross-tables), that are straightforward to export to HTML or Office documents. It can do 1-way tables (wide or long), 2-way tables, 3-way tables and 4-way tables. It is based on `flextable`.
 
 The package was developed at [IVO](https://www.ivo.se), The Health and Social Care Inspectorate in Sweden.
 
@@ -129,13 +129,6 @@ rowsums = TRUE,
 highlight_cols = 6)
 
 ivo_table_masked(data4, colsums = TRUE, rowsums = TRUE)
-```
-
-### Exporting to an Excel xlsx file
-`ivo_flextable_to_xlsx` lets you export `flextable` objects (including the tables creating using `ivo_table`) with the formatting intact.
-
-```
-ivo_table_masked(data4, colsums = TRUE, rowsums = TRUE) |> ivo_flextable_to_xlsx("example_table")
 ```
 
 ### Exporting to a Word docx file
