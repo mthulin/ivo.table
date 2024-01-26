@@ -14,7 +14,7 @@ Authors@R:
            family = "Furne",
            role = c("aut"),
            email = "stefan.furne@ivo.se"))
-Description: Nicely formatted frequency tables and contingency tables (1-way, 2-way, 3-way and 4-way tables), that can easily be exported to HTML or 'Office' documents, including 'Excel'. Designed to work with pipes.
+Description: Nicely formatted frequency tables and contingency tables (1-way, 2-way, 3-way and 4-way tables), that can easily be exported to HTML or 'Office' documents. Designed to work with pipes.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -24,12 +24,6 @@ RoxygenNote: 7.2.3
 Imports: 
     dplyr,
     flextable,
-    openxlsx,
     checkmate,
     officer,
-    purrr,
-    stringr,
     tidyr
-Suggests: 
-    testthat (>= 3.0.0)
-Config/testthat/edition: 3

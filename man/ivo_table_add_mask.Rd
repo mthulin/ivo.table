@@ -8,7 +8,7 @@
 ivo_table_add_mask(df, cell = 5)
 }
 \arguments{
-\item{df}{A data frame containing a column called "Freq", e.g. a frequency table created using \code{ftable() |> data.frame()}.}
+\item{df}{A data frame containing a column called "Freq", e.g. a frequency table created using \code{ftable(exclude=NULL) |> data.frame()}.}
 
 \item{cell}{The cell count at which masking should be used. Cell counts between 1 and this number will be masked. The default is 5.}
 }
@@ -30,7 +30,7 @@ B = sample(c("Apples", "Oranges", "Bananas"), 50, replace = TRUE),
 C = sample(c("Swedish", "Norwegian", "Chilean"), 50, replace = TRUE))
 # With masking limit set at 7:
 example_data |> select(Year, A) |>
-  ftable() |>
+  ftable(exclude=NULL) |>
   data.frame() |>
   ivo_table_add_mask(cell = 7)
 
