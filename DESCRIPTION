@@ -13,7 +13,7 @@ Authors@R:
      person(given = "Stefan",
            family = "Furne",
            role = c("aut"),
-           email = "stefan.furne@ivo.se"))
+           email = "stefan@furne.net"))
 Description: Nicely formatted frequency tables and contingency tables (1-way, 2-way, 3-way and 4-way tables), that can easily be exported to HTML or 'Office' documents. Designed to work with pipes.
 License: MIT + file LICENSE
 Encoding: UTF-8
