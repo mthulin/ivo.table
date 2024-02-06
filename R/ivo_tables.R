@@ -774,8 +774,6 @@ ivo_table <- function(df, extra_header = TRUE, exclude_missing = FALSE, missing_
 #' ### 4-way tables ###
 #' data4 <- example_data |> dplyr::select(Year, B, C, A)
 #' ivo_table_masked(data4, colsums = TRUE, rowsums = TRUE)
-#'
-#' }
 #' @export
 ivo_table_masked <- function(df, cell = 5, extra_header = TRUE, exclude_missing = FALSE, missing_string = "(Missing)", colsums = FALSE, rowsums = FALSE, sums_string = "Total", caption = NA, highlight_cols = NULL, highlight_rows = NULL, color = "darkgreen", font_name = "Arial", long_table = FALSE, remove_zero_rows = FALSE) {
 
