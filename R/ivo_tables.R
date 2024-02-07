@@ -26,12 +26,13 @@ ivo_excl_missing <- function(df, exclude_missing = FALSE, missing_string = "(Mis
 {
   if(!exclude_missing) {
     for(i in 1:ncol(df)){
-      if(is.factor(df[,i]) & sum(is.na(df[,i]))>0) {
-        levs <- levels(df[,i])
-        df[,i] <- as.character(df[,i])
-        df[is.na(df[,i]),i] <- "6049122418972891471204127890512XY"
-        df[,i] <- factor(df[,i], levels = c(levs, "6049122418972891471204127890512XY"), labels = c(levs, missing_string))
-      } else { df[is.na(df[,i]), i] <- missing_string }
+      if(is.factor(df[[i]]) & sum(is.na(df[[i]]))>0) {
+
+        levs <- levels(df[[i]])
+        df[[i]] <- as.character(df[[i]])
+        df[is.na(df[[i]]),i] <- "6049122418972891471204127890512XY"
+        df[[i]] <- factor(df[[i]], levels = c(levs, "6049122418972891471204127890512XY"), labels = c(levs, missing_string))
+      } else if(sum(is.na(df[[i]]))>0) { df[is.na(df[[i]]), i] <- missing_string }
     }}
   return(df)
 }
