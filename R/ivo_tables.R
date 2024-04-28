@@ -39,9 +39,8 @@ ivo_excl_missing <- function(df, exclude_missing = FALSE, missing_string = "(Mis
 
 ivo_num_sum <- function(x)
 {
-  suppressWarnings(x <- sum(as.numeric(unlist(gsub("\\s+", "", x)))))
+  suppressWarnings(x <- format(sum(as.numeric(unlist(gsub("\\s+", "", x)))), big.mark = " "))
   x[is.na(x)] <- "-"
-  if (grepl("^\\d+$", x)) x <- paste0(format(as.numeric(x), big.mark = " "))
   return(x)
 }
 
