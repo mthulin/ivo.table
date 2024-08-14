@@ -34,7 +34,7 @@ ivo_excl_missing <- function(df, exclude_missing = FALSE, missing_string = "(Mis
         df[[i]] <- factor(df[[i]], levels = c(levs, "6049122418972891471204127890512XY"), labels = c(levs, missing_string))
       } else if(sum(is.na(df[[i]]))>0) { df[is.na(df[[i]]), i] <- missing_string }
     }} else {
-      df <- na.omit(df)
+      df <- stats::na.omit(df)
     }
   return(df)
 }
