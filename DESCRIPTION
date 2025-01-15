@@ -1,6 +1,6 @@
 Package: ivo.table
 Title: Nicely Formatted Contingency Tables and Frequency Tables
-Version: 0.5
+Version: 0.6
 Authors@R: 
     c(person(given = "Måns",
            family = "Thulin",
@@ -27,3 +27,8 @@ Imports:
     checkmate,
     officer,
     tidyr
+Suggests: 
+    knitr,
+    rmarkdown,
+    palmerpenguins
+VignetteBuilder: knitr

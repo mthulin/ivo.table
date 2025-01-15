@@ -1,0 +1,100 @@
+---
+title: "Quick and pretty frequency tables with ivo_table"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{ivo_table}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Background
+R has some great packages for creating nice-looking tables. Packages like `gt` and `flextable` allow the user to create a wide range of tables, with lots of flexibility in how these are presented and formatted. The downside to these Swiss army knife-style packages is that simple tasks, like creating a frequency table, require a lot of typing. Enter `ivo_table`, a package for creating great-looking frequency tables and contingency tables without any hassle.
+
+## A first example
+Let's look at some examples using the `penguins` data from the [`palmerpenguins`](https://cran.r-project.org/web/packages/palmerpenguins/) package. Let's say that we want to create a contingency table showing the counts of the categorical variables `species`, `sex`, and `island`. We can use `ftable` along with `dplyr`'s `select`:
+
+```{r example1}
+library(dplyr)
+library(palmerpenguins)
+
+penguins |> select(species, sex, island) |> ftable()
+```
+
+While informative, the formatting isn't great, and it's not something that we can easily export to a report or presentation.
+
+`ivo.table` uses the same syntax, but with `ivo_table` instead of `ftable`:
+
+```{r example2}
+library(ivo.table)
+
+penguins |> select(species, sex, island) |> ivo_table()
+```
+
+The resulting table can easily be exported to a Word document:
+
+```{r example3, eval = FALSE}
+penguins |>
+  select(species, sex, island) |>
+  ivo_table() |> 
+  flextable::save_as_docx(path = "example_table.docx")
+```
+
+You can easily add row and column sums:
+
+```{r example4}
+penguins |>
+  select(species, sex, island) |>
+  ivo_table(colsums = TRUE,
+            rowsums = TRUE)
+```
+
+Or show percentages instead of counts, e.g. computed by column:
+
+```{r example5}
+penguins |>
+  select(species, sex, island) |>
+  ivo_table(percent_by = "col")
+```
+
+
+
+## Changing the appearance of your tables
+`ivo_table` has lots of options for customising the look of your table. You can change the colours and fonts used, highlight columns, rows or cells, make columns bold, add row and column sums, and more. Let's look at some examples.
+
+Change the font to Courier, use red instead of green, and make the names in the `sex` column bold:
+
+```{r example6}
+penguins |>
+  select(species, sex, island) |>
+  ivo_table(color = "red",
+            font_name = "Courier",
+            bold_cols = 1)
+```
+
+Add a caption and highlight the cell on the fourth row of the third column:
+
+```{r example7}
+penguins |>
+  select(species, sex, island) |>
+  ivo_table(caption = "A table with penguins in it",
+            highlight_cols = 3,
+            highlight_rows = 4)
+```
+
+`ivo_table` returns a `flextable` object, meaning that all [functions used to style flextables](https://ardata-fr.github.io/flextable-book/define-visual-properties.html) can be used. For instance, you can change the font size used in different parts of the table using `flextable::fontsize` and change the background colour using `flextable::bg`:
+
+```{r example8}
+penguins |>
+  select(species, sex, island) |>
+  ivo_table(color = "darkblue") |> 
+  flextable::fontsize(size = 8, part = "body") |> 
+  flextable::fontsize(size = 12, part = "header") |> 
+  flextable::bg(bg = "pink", part = "all")
+```

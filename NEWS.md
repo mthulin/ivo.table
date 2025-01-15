@@ -1,3 +1,6 @@
+# ivo.table version 0.6
+Added options for table formatting. Added a vignette.
+
 # ivo.table version 0.5
 Improved table formatting and fixed a bug that could occur for datasets with missing data.
 
