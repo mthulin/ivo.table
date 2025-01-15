@@ -239,7 +239,7 @@ ivo_tab4_step2 <- function(df, v1, v2, v3, v4, extra_header, colsums, rowsums, p
 # _____________________________________________________________
 # IVO internal table functions to create correct ivo_table()----
 
-ivo_table_1way <- function(df, varleft, extra_header = TRUE, exclude_missing = FALSE, missing_string = "(Missing)", colsums = colsums, rowsums = rowsums, caption = NA, highlight_cols = NULL, highlight_rows = NULL, percent_by = NA, color = "darkgreen", font_name = "Arial", long_table = FALSE, sums_string = "Total")
+ivo_table_1way <- function(df, varleft, extra_header = TRUE, exclude_missing = FALSE, missing_string = "(Missing)", colsums = colsums, rowsums = rowsums, caption = NA, highlight_cols = NULL, highlight_rows = NULL, percent_by = NA, color = "darkgreen", font_name = "Arial", bold_cols = NULL, long_table = FALSE, sums_string = "Total")
 {
   Total <- NULL
   ncol_v4 <- df |> dplyr::pull({{varleft}}) |> unique() |> length()
@@ -273,7 +273,7 @@ ivo_table_1way <- function(df, varleft, extra_header = TRUE, exclude_missing = F
     df |> flextable::regulartable() |>
     ivo_add_col_sums(new_row, colsums) |>
     flextable::autofit() |>
-    ivo_flextable_theme(1, rowsums = FALSE, caption, highlight_cols, highlight_rows, color, font_name) -> df } else {
+    ivo_flextable_theme(1, rowsums = FALSE, caption, highlight_cols, highlight_rows, color, font_name, bold_cols) -> df } else {
       df |> dplyr::select({{varleft}}) |>
         ivo_excl_missing(exclude_missing, missing_string) |>
         stats::ftable(exclude=NULL) |>
@@ -299,14 +299,14 @@ ivo_table_1way <- function(df, varleft, extra_header = TRUE, exclude_missing = F
         df |> flextable::regulartable() |>
         ivo_add_extra_header_1way(name_v4, ncol_v4, extra_header, rowsums) |>
         flextable::autofit() |>
-        ivo_flextable_theme(1, rowsums, caption, highlight_cols, highlight_rows, color, font_name) -> df
+        ivo_flextable_theme(1, rowsums, caption, highlight_cols, highlight_rows, color, font_name, bold_cols) -> df
     }
 
   if(!is.na(percent_by)) { df |> flextable::colformat_double(decimal.mark = ",", suffix = " %", big.mark = " ") } else { df }
 }
 
 
-ivo_masked_table_1way <- function(df, varleft, cell = 5, extra_header = TRUE, exclude_missing = FALSE, missing_string = "(Missing)", colsums = FALSE, rowsums = FALSE, caption = NA, highlight_cols = NULL, highlight_rows = NULL, color = "darkgreen", font_name = "Arial",  long_table = FALSE, sums_string = "Total"){
+ivo_masked_table_1way <- function(df, varleft, cell = 5, extra_header = TRUE, exclude_missing = FALSE, missing_string = "(Missing)", colsums = FALSE, rowsums = FALSE, caption = NA, highlight_cols = NULL, highlight_rows = NULL, color = "darkgreen", font_name = "Arial", bold_cols = NULL,  long_table = FALSE, sums_string = "Total"){
   Total <- NULL
   ncol_v4 <- df |> dplyr::pull({{varleft}}) |> unique() |> length()
   name_v4 <- df |> dplyr::select({{varleft}}) |> names()
@@ -326,7 +326,7 @@ ivo_masked_table_1way <- function(df, varleft, cell = 5, extra_header = TRUE, ex
       df |> flextable::regulartable() |>
       ivo_add_col_sums(new_row, colsums) |>
       flextable::autofit() |>
-      ivo_flextable_theme(1, rowsums = FALSE, caption, highlight_cols, highlight_rows, color, font_name) } else {
+      ivo_flextable_theme(1, rowsums = FALSE, caption, highlight_cols, highlight_rows, color, font_name, bold_cols) } else {
         df |> dplyr::select({{varleft}}) |> ivo_excl_missing(exclude_missing, missing_string) |>
         stats::ftable(exclude=NULL) |>
         base::data.frame() |>
@@ -341,26 +341,26 @@ ivo_masked_table_1way <- function(df, varleft, cell = 5, extra_header = TRUE, ex
         df |> flextable::regulartable() |>
         ivo_add_extra_header_1way(name_v4, ncol_v4, extra_header, rowsums) |>
         flextable::autofit() |>
-        ivo_flextable_theme(1, rowsums, caption, highlight_cols, highlight_rows, color, font_name)
+        ivo_flextable_theme(1, rowsums, caption, highlight_cols, highlight_rows, color, font_name, bold_cols)
     }
 
 
 }
 
 
-ivo_table_2way <- function(df, varleft, vartop, extra_header = TRUE, exclude_missing = FALSE, missing_string = "(Missing)", colsums = FALSE, rowsums = FALSE, sums_string = "Total", caption = NA, highlight_cols = NULL, highlight_rows = NULL, percent_by = NA, color = "darkgreen", font_name = "Arial",  remove_zero_rows = FALSE)
+ivo_table_2way <- function(df, varleft, vartop, extra_header = TRUE, exclude_missing = FALSE, missing_string = "(Missing)", colsums = FALSE, rowsums = FALSE, sums_string = "Total", caption = NA, highlight_cols = NULL, highlight_rows = NULL, percent_by = NA, color = "darkgreen", font_name = "Arial", bold_cols = NULL,  remove_zero_rows = FALSE)
 {
 
   # Create the table
   df |> ivo_tab2_step1({{ varleft }}, {{ vartop }}, exclude_missing, missing_string) |>
     ivo_tab2_step2({{ varleft }}, {{ vartop }}, extra_header, colsums, rowsums, percent_by, remove_zero_rows, sums_string) |>
-    ivo_flextable_theme(2, rowsums, caption, highlight_cols, highlight_rows, color, font_name) -> df
+    ivo_flextable_theme(2, rowsums, caption, highlight_cols, highlight_rows, color, font_name, bold_cols) -> df
 
   if(!is.na(percent_by)) { df |> flextable::colformat_double(decimal.mark = ",", suffix = " %", big.mark = " ") } else { df }
 }
 
 
-ivo_masked_table_2way <- function(df, varleft, vartop, cell = 5, extra_header = TRUE, exclude_missing = FALSE, missing_string = "(Missing)", colsums = FALSE, rowsums = FALSE, sums_string = "Total", caption = NA, highlight_cols = NULL, highlight_rows = NULL, color = "darkgreen", font_name = "Arial",  remove_zero_rows = FALSE)
+ivo_masked_table_2way <- function(df, varleft, vartop, cell = 5, extra_header = TRUE, exclude_missing = FALSE, missing_string = "(Missing)", colsums = FALSE, rowsums = FALSE, sums_string = "Total", caption = NA, highlight_cols = NULL, highlight_rows = NULL, color = "darkgreen", font_name = "Arial", bold_cols = NULL,  remove_zero_rows = FALSE)
 {
 
   # Create the masked table
@@ -371,44 +371,44 @@ ivo_masked_table_2way <- function(df, varleft, vartop, cell = 5, extra_header = 
 }
 
 
-ivo_table_3way <- function(df, varleft, varright, vartop, extra_header = TRUE, exclude_missing = FALSE, missing_string = "(Missing)", colsums = FALSE, rowsums = FALSE, sums_string = "Total", caption = NA, highlight_cols = NULL, highlight_rows = NULL, percent_by = NA, color = "darkgreen", font_name = "Arial",  remove_zero_rows = FALSE)
+ivo_table_3way <- function(df, varleft, varright, vartop, extra_header = TRUE, exclude_missing = FALSE, missing_string = "(Missing)", colsums = FALSE, rowsums = FALSE, sums_string = "Total", caption = NA, highlight_cols = NULL, highlight_rows = NULL, percent_by = NA, color = "darkgreen", font_name = "Arial", bold_cols = NULL,  remove_zero_rows = FALSE)
 {
 
   # Create the table
   df |> ivo_tab3_step1({{ varleft }}, {{ varright }}, {{ vartop }}, exclude_missing, missing_string) |>
     ivo_tab3_step2({{ varleft }}, {{ varright }}, {{ vartop }}, extra_header, colsums, rowsums, percent_by, remove_zero_rows, sums_string) |>
-    ivo_flextable_theme(3, rowsums, caption, highlight_cols, highlight_rows, color, font_name) -> df
+    ivo_flextable_theme(3, rowsums, caption, highlight_cols, highlight_rows, color, font_name, bold_cols) -> df
 
   if(!is.na(percent_by)) { df |> flextable::colformat_double(decimal.mark = ",", suffix = " %", big.mark = " ") } else { df }
 }
 
-ivo_masked_table_3way <- function(df, varleft, varright, vartop, cell = 5, extra_header = TRUE, exclude_missing = FALSE, missing_string = "(Missing)", colsums = FALSE, rowsums = FALSE, sums_string = "Total", caption = NA, highlight_cols = NULL, highlight_rows = NULL, color = "darkgreen", font_name = "Arial",  remove_zero_rows = FALSE)
+ivo_masked_table_3way <- function(df, varleft, varright, vartop, cell = 5, extra_header = TRUE, exclude_missing = FALSE, missing_string = "(Missing)", colsums = FALSE, rowsums = FALSE, sums_string = "Total", caption = NA, highlight_cols = NULL, highlight_rows = NULL, color = "darkgreen", font_name = "Arial", bold_cols = NULL,  remove_zero_rows = FALSE)
 {
   # Create the masked table
   df |> ivo_tab3_step1({{ varleft }}, {{ varright }}, {{ vartop }}, exclude_missing, missing_string) |>
     ivo_table_add_mask(cell) |>
     ivo_tab3_step2({{ varleft }}, {{ varright }}, {{ vartop }}, extra_header, colsums, rowsums, percent_by = NA, remove_zero_rows, sums_string) |>
-    ivo_flextable_theme(3, rowsums, caption, highlight_cols, highlight_rows, color, font_name)
+    ivo_flextable_theme(3, rowsums, caption, highlight_cols, highlight_rows, color, font_name, bold_cols)
 }
 
-ivo_table_4way <- function(df, varleft, varleft2, varright, vartop, extra_header = TRUE, exclude_missing = FALSE, missing_string = "(Missing)", colsums = FALSE, rowsums = FALSE, sums_string = "Total", caption = NA, highlight_cols = NULL, highlight_rows = NULL, percent_by = NA, color = "darkgreen", font_name = "Arial",  remove_zero_rows = FALSE)
+ivo_table_4way <- function(df, varleft, varleft2, varright, vartop, extra_header = TRUE, exclude_missing = FALSE, missing_string = "(Missing)", colsums = FALSE, rowsums = FALSE, sums_string = "Total", caption = NA, highlight_cols = NULL, highlight_rows = NULL, percent_by = NA, color = "darkgreen", font_name = "Arial", bold_cols = NULL,  remove_zero_rows = FALSE)
 {
   # Create the table
   df |> ivo_tab4_step1({{ varleft }}, {{ varleft2 }}, {{ varright }}, {{ vartop }}, exclude_missing, missing_string) |>
     ivo_tab4_step2({{ varleft }}, {{ varleft2 }}, {{ varright }}, {{ vartop }}, extra_header, colsums, rowsums, percent_by, remove_zero_rows, sums_string) |>
-    ivo_flextable_theme(4, rowsums, caption, highlight_cols, highlight_rows, color, font_name) -> df
+    ivo_flextable_theme(4, rowsums, caption, highlight_cols, highlight_rows, color, font_name, bold_cols) -> df
 
   if(!is.na(percent_by)) { df |> flextable::colformat_double(decimal.mark = ",", suffix = " %", big.mark = " ") } else { df }
 }
 
-ivo_masked_table_4way <- function(df, varleft, varleft2, varright, vartop, cell = 5, extra_header = TRUE, exclude_missing = FALSE, missing_string = "(Missing)", colsums = FALSE, sums_string = "Total", rowsums = FALSE, caption = NA, highlight_cols = NULL, highlight_rows = NULL, color = "darkgreen", font_name = "Arial",  remove_zero_rows = FALSE)
+ivo_masked_table_4way <- function(df, varleft, varleft2, varright, vartop, cell = 5, extra_header = TRUE, exclude_missing = FALSE, missing_string = "(Missing)", colsums = FALSE, sums_string = "Total", rowsums = FALSE, caption = NA, highlight_cols = NULL, highlight_rows = NULL, color = "darkgreen", font_name = "Arial", bold_cols = NULL,  remove_zero_rows = FALSE)
 {
 
   # Create the table
   df |> ivo_tab4_step1({{ varleft }}, {{ varleft2 }}, {{ varright }}, {{ vartop }}, exclude_missing, missing_string) |>
     ivo_table_add_mask(cell) |>
     ivo_tab4_step2({{ varleft }}, {{ varleft2 }}, {{ varright }}, {{ vartop }}, extra_header, colsums, rowsums, percent_by = NA, remove_zero_rows, sums_string) |>
-    ivo_flextable_theme(4, rowsums, caption, highlight_cols, highlight_rows, color, font_name)
+    ivo_flextable_theme(4, rowsums, caption, highlight_cols, highlight_rows, color, font_name, bold_cols)
 }
 
 
@@ -417,7 +417,7 @@ ivo_masked_table_4way <- function(df, varleft, varleft2, varright, vartop, cell 
 #' @title Add masking (censoring) to a table
 #' @name ivo_table_add_mask
 #' @encoding UTF-8
-#' @description Table masking using cell counts..
+#' @description Table masking using cell counts.
 #'
 #' @param df A data frame containing a column called "Freq", e.g. a frequency table created using \code{ftable(exclude=NULL) |> data.frame()}.
 #' @param cell The cell count at which masking should be used. Cell counts between 1 and this number will be masked. The default is 5.
@@ -468,6 +468,7 @@ ivo_table_add_mask <- function(df, cell = 5)
 #' @param highlight_rows A numeric vector containing the indices of the rows that should be highlighted.
 #' @param color A named color or a color HEX code, used for the lines in the table. Defaults to "darkgreen".
 #' @param font_name The name of the font to be used in the table. Defaults to "Arial".
+#' @param bold_cols A numeric vector containing the indices of the columns that should use a bold font.
 #'
 #' @return A styled flextable.
 #' @details The default settings use a dark green color and a sans serif font.
@@ -487,7 +488,7 @@ ivo_table_add_mask <- function(df, cell = 5)
 #'   regulartable() |>
 #'   ivo_flextable_theme()
 #' @export
-ivo_flextable_theme <- function(x, kway = 2, rowsums = FALSE, caption = NA, highlight_cols = NULL, highlight_rows = NULL, color = "darkgreen", font_name = "Arial")
+ivo_flextable_theme <- function(x, kway = 2, rowsums = FALSE, caption = NA, highlight_cols = NULL, highlight_rows = NULL, color = "darkgreen", font_name = "Arial", bold_cols = NULL)
 {
 
 
@@ -543,6 +544,7 @@ ivo_flextable_theme <- function(x, kway = 2, rowsums = FALSE, caption = NA, high
   # Gör rubrik och summa för kolumnsumner till fetstil:
   x <- flextable::bold(x = x, bold = TRUE, part = "header")
   x <- flextable::bold(x = x,  bold = TRUE, part = "footer")
+  if(!is.null(bold_cols)) { x <- flextable::bold(x = x,  j = bold_cols) }
   if(rowsums) { x <- flextable::bold(x, j = flextable::ncol_keys(x), bold = TRUE, part = "body") }
 
   # Formatera siffror till svensk standard (decimalkomma, mellanslag mellan tusental):
@@ -552,7 +554,7 @@ ivo_flextable_theme <- function(x, kway = 2, rowsums = FALSE, caption = NA, high
   # Use custom font:
   x <- flextable::font(x, fontname = font_name, part = "all")
 
-  # Fixa fel som uppstYear när celler slås ihop:
+  # Fixa fel som uppstår när celler slås ihop:
   flextable::fix_border_issues(x)
 }
 
@@ -572,6 +574,7 @@ ivo_flextable_theme <- function(x, kway = 2, rowsums = FALSE, caption = NA, high
 #' @param percent_by Used to get percentages instead of frequencies. There are three options: "row" to get percentages by row (each row sum is 100 percent), "col" to get percentages by column (each the sum of each row to 100 percent) and "tot" to get percentages out of the total (the sum of all cells is 100 percent). The default, NA, means that frequencies are displayed instead.
 #' @param color A named color or a color HEX code, used for the lines in the table. Defaults to "darkgreen".
 #' @param font_name The name of the font to be used in the table. Defaults to "Arial".
+#' @param bold_cols A numeric vector containing the indices of the columns that should use a bold font.
 #' @param long_table For one-way tables: FALSE (the default) means that the table will be wide and consist of a single row, TRUE means that the table will be long and consist of a single column.
 #' @param remove_zero_rows If set to TRUE, removes all rows that contain nothing but zeros. The default is FALSE.
 #' @return A stylized \code{flextable}.
@@ -612,6 +615,7 @@ ivo_flextable_theme <- function(x, kway = 2, rowsums = FALSE, caption = NA, high
 #' ivo_table(data2, caption = "Awesome table") # Add a caption
 #' ivo_table(data2, highlight_cols = 3) # Highlight column 3
 #' ivo_table(data2, highlight_rows = 2, highlight_cols = 3) # Highlight cell at row 2 column 3
+#' ivo_table(data2, bold_cols = 1) # Make the names in the first column bold
 #'
 #' # Tables with percentages:
 #' ivo_table(data2, percent_by = "row") # By row
@@ -678,7 +682,7 @@ ivo_flextable_theme <- function(x, kway = 2, rowsums = FALSE, caption = NA, high
 #'
 #' ivo_table_masked(data4, colsums = TRUE, rowsums = TRUE)
 #' @export
-ivo_table <- function(df, extra_header = TRUE, exclude_missing = FALSE, missing_string = "(Missing)", colsums = FALSE, rowsums = FALSE, sums_string = "Total", caption = NA, highlight_cols = NULL, highlight_rows = NULL, percent_by = NA, color = "darkgreen", font_name = "Arial", long_table = FALSE, remove_zero_rows = FALSE) {
+ivo_table <- function(df, extra_header = TRUE, exclude_missing = FALSE, missing_string = "(Missing)", colsums = FALSE, rowsums = FALSE, sums_string = "Total", caption = NA, highlight_cols = NULL, highlight_rows = NULL, percent_by = NA, color = "darkgreen", font_name = "Arial", bold_cols = NULL, long_table = FALSE, remove_zero_rows = FALSE) {
   # Funktionskontroller
   coll <- checkmate::makeAssertCollection()
 
@@ -708,13 +712,13 @@ ivo_table <- function(df, extra_header = TRUE, exclude_missing = FALSE, missing_
 
   # Number of variables in df
   if (length(var_name) == 1) {
-    ivo_table_1way(df = df, varleft = var_name[1], extra_header = extra_header, exclude_missing = exclude_missing, missing_string = missing_string, colsums = colsums, rowsums = rowsums, sums_string = sums_string, caption = caption, highlight_cols = highlight_cols, highlight_rows = highlight_rows, percent_by = percent_by, color = color, font_name = font_name,  long_table = long_table)
+    ivo_table_1way(df = df, varleft = var_name[1], extra_header = extra_header, exclude_missing = exclude_missing, missing_string = missing_string, colsums = colsums, rowsums = rowsums, sums_string = sums_string, caption = caption, highlight_cols = highlight_cols, highlight_rows = highlight_rows, percent_by = percent_by, color = color, font_name = font_name, bold_cols = bold_cols,  long_table = long_table)
   } else if (length(var_name) == 2) {
-    ivo_table_2way(df = df, varleft = var_name[2], vartop = var_name[1], extra_header = extra_header, exclude_missing = exclude_missing, missing_string = missing_string, colsums = colsums, rowsums = rowsums, sums_string = sums_string, caption = caption, highlight_cols = highlight_cols, highlight_rows = highlight_rows, percent_by = percent_by, color = color, font_name = font_name,  remove_zero_rows = remove_zero_rows)
+    ivo_table_2way(df = df, varleft = var_name[2], vartop = var_name[1], extra_header = extra_header, exclude_missing = exclude_missing, missing_string = missing_string, colsums = colsums, rowsums = rowsums, sums_string = sums_string, caption = caption, highlight_cols = highlight_cols, highlight_rows = highlight_rows, percent_by = percent_by, color = color, font_name = font_name, bold_cols = bold_cols,  remove_zero_rows = remove_zero_rows)
   } else if (length(var_name) == 3) {
-    ivo_table_3way(df = df, varleft = var_name[2], varright = var_name[3], vartop = var_name[1], extra_header = extra_header, exclude_missing = exclude_missing, missing_string = missing_string, colsums = colsums, rowsums = rowsums, sums_string = sums_string, caption = caption, highlight_cols = highlight_cols, highlight_rows = highlight_rows, percent_by = percent_by, color = color, font_name = font_name,  remove_zero_rows = remove_zero_rows)
+    ivo_table_3way(df = df, varleft = var_name[2], varright = var_name[3], vartop = var_name[1], extra_header = extra_header, exclude_missing = exclude_missing, missing_string = missing_string, colsums = colsums, rowsums = rowsums, sums_string = sums_string, caption = caption, highlight_cols = highlight_cols, highlight_rows = highlight_rows, percent_by = percent_by, color = color, font_name = font_name, bold_cols = bold_cols,  remove_zero_rows = remove_zero_rows)
   } else {
-    ivo_table_4way(df = df, varleft = var_name[2], varleft2 = var_name[3], varright = var_name[4], vartop = var_name[1], extra_header = extra_header, exclude_missing = exclude_missing, missing_string = missing_string, colsums = colsums, rowsums = rowsums, sums_string = sums_string, caption = caption, highlight_cols = highlight_cols, highlight_rows = highlight_rows, percent_by = percent_by, color = color, font_name = font_name,  remove_zero_rows = remove_zero_rows)
+    ivo_table_4way(df = df, varleft = var_name[2], varleft2 = var_name[3], varright = var_name[4], vartop = var_name[1], extra_header = extra_header, exclude_missing = exclude_missing, missing_string = missing_string, colsums = colsums, rowsums = rowsums, sums_string = sums_string, caption = caption, highlight_cols = highlight_cols, highlight_rows = highlight_rows, percent_by = percent_by, color = color, font_name = font_name, bold_cols = bold_cols,  remove_zero_rows = remove_zero_rows)
   }
 }
 
@@ -734,6 +738,7 @@ ivo_table <- function(df, extra_header = TRUE, exclude_missing = FALSE, missing_
 #' @param highlight_rows A numeric vector containing the indices of the rows that should be highlighted.
 #' @param color A named color or a color HEX code, used for the lines in the table. Defaults to "darkgreen".
 #' @param font_name The name of the font to be used in the table. Defaults to "Arial".
+#' @param bold_cols A numeric vector containing the indices of the columns that should use a bold font.
 #' @param long_table For one-way tables: FALSE (the default) means that the table will be wide and consist of a single row, TRUE means that the table will be long and consist of a single column.
 #' @param remove_zero_rows If set to TRUE, removes all rows that contain nothing but zeros. The default is FALSE.
 #' @return A stylized \code{flextable}.
@@ -778,7 +783,7 @@ ivo_table <- function(df, extra_header = TRUE, exclude_missing = FALSE, missing_
 #' data4 <- example_data |> dplyr::select(Year, B, C, A)
 #' ivo_table_masked(data4, colsums = TRUE, rowsums = TRUE)
 #' @export
-ivo_table_masked <- function(df, cell = 5, extra_header = TRUE, exclude_missing = FALSE, missing_string = "(Missing)", colsums = FALSE, rowsums = FALSE, sums_string = "Total", caption = NA, highlight_cols = NULL, highlight_rows = NULL, color = "darkgreen", font_name = "Arial", long_table = FALSE, remove_zero_rows = FALSE) {
+ivo_table_masked <- function(df, cell = 5, extra_header = TRUE, exclude_missing = FALSE, missing_string = "(Missing)", colsums = FALSE, rowsums = FALSE, sums_string = "Total", caption = NA, highlight_cols = NULL, highlight_rows = NULL, color = "darkgreen", font_name = "Arial", bold_cols = NULL, long_table = FALSE, remove_zero_rows = FALSE) {
 
   # Funktionskontroller
   coll <- checkmate::makeAssertCollection()
@@ -812,12 +817,12 @@ ivo_table_masked <- function(df, cell = 5, extra_header = TRUE, exclude_missing 
 
   # Number of variables in df
   if (length(var_name) == 1) {
-    ivo_masked_table_1way(df = df, varleft = var_name[1], cell = cell, extra_header = extra_header, exclude_missing = exclude_missing, missing_string = missing_string, colsums = colsums, rowsums = rowsums, sums_string = sums_string, caption = caption, highlight_cols = highlight_cols, highlight_rows = highlight_rows, color = color, font_name = font_name, long_table = long_table)
+    ivo_masked_table_1way(df = df, varleft = var_name[1], cell = cell, extra_header = extra_header, exclude_missing = exclude_missing, missing_string = missing_string, colsums = colsums, rowsums = rowsums, sums_string = sums_string, caption = caption, highlight_cols = highlight_cols, highlight_rows = highlight_rows, color = color, font_name = font_name, bold_cols = bold_cols, long_table = long_table)
   } else if (length(var_name) == 2) {
-    ivo_masked_table_2way(df = df, varleft = var_name[2], vartop = var_name[1], cell = cell, extra_header = extra_header, exclude_missing = exclude_missing, missing_string = missing_string, colsums = colsums, rowsums = rowsums, sums_string = sums_string, caption = caption, highlight_cols = highlight_cols, highlight_rows = highlight_rows, color = color, font_name = font_name, remove_zero_rows = remove_zero_rows)
+    ivo_masked_table_2way(df = df, varleft = var_name[2], vartop = var_name[1], cell = cell, extra_header = extra_header, exclude_missing = exclude_missing, missing_string = missing_string, colsums = colsums, rowsums = rowsums, sums_string = sums_string, caption = caption, highlight_cols = highlight_cols, highlight_rows = highlight_rows, color = color, font_name = font_name, bold_cols = bold_cols, remove_zero_rows = remove_zero_rows)
   } else if (length(var_name) == 3) {
-    ivo_masked_table_3way(df = df, varleft = var_name[2], varright = var_name[3], vartop = var_name[1], cell = cell, extra_header = extra_header, exclude_missing = exclude_missing, missing_string = missing_string, colsums = colsums, rowsums = rowsums, sums_string = sums_string, caption = caption, highlight_cols = highlight_cols, highlight_rows = highlight_rows, color = color, font_name = font_name, remove_zero_rows = remove_zero_rows)
+    ivo_masked_table_3way(df = df, varleft = var_name[2], varright = var_name[3], vartop = var_name[1], cell = cell, extra_header = extra_header, exclude_missing = exclude_missing, missing_string = missing_string, colsums = colsums, rowsums = rowsums, sums_string = sums_string, caption = caption, highlight_cols = highlight_cols, highlight_rows = highlight_rows, color = color, font_name = font_name, bold_cols = bold_cols, remove_zero_rows = remove_zero_rows)
   } else {
-    ivo_masked_table_4way(df = df, varleft = var_name[2], varleft2 = var_name[3], varright = var_name[4], vartop = var_name[1], cell = cell, extra_header = extra_header, exclude_missing = exclude_missing, missing_string = missing_string, colsums = colsums, rowsums = rowsums, sums_string = sums_string, caption = caption, highlight_cols = highlight_cols, highlight_rows = highlight_rows, color = color, font_name = font_name, remove_zero_rows = remove_zero_rows)
+    ivo_masked_table_4way(df = df, varleft = var_name[2], varleft2 = var_name[3], varright = var_name[4], vartop = var_name[1], cell = cell, extra_header = extra_header, exclude_missing = exclude_missing, missing_string = missing_string, colsums = colsums, rowsums = rowsums, sums_string = sums_string, caption = caption, highlight_cols = highlight_cols, highlight_rows = highlight_rows, color = color, font_name = font_name, bold_cols = bold_cols, remove_zero_rows = remove_zero_rows)
   }
 }

@@ -19,6 +19,7 @@ ivo_table(
   percent_by = NA,
   color = "darkgreen",
   font_name = "Arial",
+  bold_cols = NULL,
   long_table = FALSE,
   remove_zero_rows = FALSE
 )
@@ -49,6 +50,8 @@ ivo_table(
 \item{color}{A named color or a color HEX code, used for the lines in the table. Defaults to "darkgreen".}
 
 \item{font_name}{The name of the font to be used in the table. Defaults to "Arial".}
+
+\item{bold_cols}{A numeric vector containing the indices of the columns that should use a bold font.}
 
 \item{long_table}{For one-way tables: FALSE (the default) means that the table will be wide and consist of a single row, TRUE means that the table will be long and consist of a single column.}
 
@@ -97,6 +100,7 @@ ivo_table(data2, rowsums = TRUE) # Add the sum of each row
 ivo_table(data2, caption = "Awesome table") # Add a caption
 ivo_table(data2, highlight_cols = 3) # Highlight column 3
 ivo_table(data2, highlight_rows = 2, highlight_cols = 3) # Highlight cell at row 2 column 3
+ivo_table(data2, bold_cols = 1) # Make the names in the first column bold
 
 # Tables with percentages:
 ivo_table(data2, percent_by = "row") # By row

@@ -16,7 +16,7 @@ ivo_table_add_mask(df, cell = 5)
 A data frame with masked cell counts.
 }
 \description{
-Table masking using cell counts..
+Table masking using cell counts.
 }
 \details{
 Masking is used to prevent the distribution of tables where individuals could be identified.

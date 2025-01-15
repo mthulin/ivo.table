@@ -19,6 +19,7 @@ ivo_table_masked(
   highlight_rows = NULL,
   color = "darkgreen",
   font_name = "Arial",
+  bold_cols = NULL,
   long_table = FALSE,
   remove_zero_rows = FALSE
 )
@@ -49,6 +50,8 @@ ivo_table_masked(
 \item{color}{A named color or a color HEX code, used for the lines in the table. Defaults to "darkgreen".}
 
 \item{font_name}{The name of the font to be used in the table. Defaults to "Arial".}
+
+\item{bold_cols}{A numeric vector containing the indices of the columns that should use a bold font.}
 
 \item{long_table}{For one-way tables: FALSE (the default) means that the table will be wide and consist of a single row, TRUE means that the table will be long and consist of a single column.}
 
