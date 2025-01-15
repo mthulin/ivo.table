@@ -9,7 +9,7 @@ Authors@R:
      person(given = "Kajsa",
            family = "Grind",
            role = c("aut"),
-           email = "kajsa.grind@ivo.se"),
+           email = "kajsa.grind@tsei.se"),
      person(given = "Stefan",
            family = "Furne",
            role = c("aut"),
