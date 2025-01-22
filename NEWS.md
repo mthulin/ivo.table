@@ -1,3 +1,6 @@
+# Development
+Fixed a bug that caused errors when ivo_table() was used with numeric variables with missing data in tibbles.
+
 # ivo.table version 0.6
 Added options for table formatting. Added a vignette.
 
