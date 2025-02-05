@@ -57,16 +57,6 @@ ivo_table_gt <- function(df,
             across(where(is.numeric), ~ replace_na(.x, 0))
         )
 
-    # Add row/column totals if needed
-    if (!is.null(totals)) {
-        if ("row" %in% totals) {
-            df <- df |> mutate(Summa = rowSums(select(., where(is.numeric)), na.rm = TRUE))
-        }
-        if ("col" %in% totals) {
-            df <- bind_rows(df, df |> summarize(across(where(is.numeric), sum, na.rm = TRUE)) |> mutate(!!!columns[[1]] := "Summa"))
-        }
-    }
-
     # Create the GT table object
     gt_table <- df |> gt()
 
