@@ -14,8 +14,8 @@
 #' @author Stefan Furne
 #' @encoding UTF-8
 #' @importFrom gt gt tab_header tab_spanner tab_source_note tab_stubhead
-#' TODO @ examples
 #' @export
+# TODO examples
 ivo_table_gt <- function(df,
                          title = NULL,
                          subtitle = NULL,
@@ -68,6 +68,9 @@ ivo_table_gt <- function(df,
             tab_source_note(source_note = source_note)
     }
 
+    # Apply theming
+    gt_table <- apply_gt_table_theme(gt_table)
+
     return(gt_table)
 }
 
@@ -77,8 +80,9 @@ ivo_table_gt <- function(df,
 #' @param columns A character vector of column names.
 #' @return A \code{data.frame} with grouped and summarized counts.
 #' @noRd
-#' @importFrom dplyr group_by summarize left_join across all_of first n distinct select
-#' @importFrom tidyr pivot_wider crossing
+#' @importFrom dplyr group_by reframe summarize left_join across all_of first n distinct select
+#' @importFrom tidyr pivot_wider expand_grid everything
+#' @importFrom purrr map set_names reduce
 group_and_count <- function(df, columns) {
     # Group and count columns
     df <- df |>
@@ -88,10 +92,10 @@ group_and_count <- function(df, columns) {
     # Handle 2-way or 3-way tables
     if (length(columns) %in% c(2, 3)) {
         # Get combinations for all selected variables so we get a complete table
-        all_combinations <- df |>
-            select(all_of(columns)) |>
-            distinct() |>
-            crossing()
+        all_combinations <- columns |>
+            map(~ unique(df[[.x]])) |>
+            reduce(expand_grid) |>
+            set_names(columns)
 
         # Join back to original df and pivot
         df <- all_combinations |>
@@ -115,4 +119,77 @@ missing_string_and_zeros <- function(df, missing_string) {
         across(where(~ is.character(.) | is.factor(.)), ~ replace_na(as.character(.), missing_string)),
         across(where(is.numeric), ~ replace_na(.x, 0))
     )
+}
+
+
+#' @title A nice GT theme
+#' @description Applies a predefined theme to a GT table, including font, colors, and alignment.
+#' @param table A \code{gt} object.
+#' @param color A named color or a color HEX code, used for the lines in the table. Defaults to "darkgreen".
+#' @param font_name The name of the font to be used in the table. Defaults to "Arial".
+#' @return A styled \code{gt} table.
+#' @noRd
+#' @importFrom gt opt_horizontal_padding opt_vertical_padding fmt_number fmt_integer tab_options
+#' @importFrom gt sub_missing cols_align tab_style cells_title cells_body cells_stub cells_column_labels
+#' @importFrom dplyr all_of
+apply_gt_table_theme <- function(table, color = "darkgreen", font_name = "Arial") {
+    # TODO Add checkmate collection
+
+    # Get theme colors
+    # TODO This should probably be a shared internal function with flextable
+    theme_color <- color
+    theme_color_mid <- theme_color |>
+        grDevices::adjustcolor(0.4) |>
+        ivo_hex8_to_hex6()
+    theme_color_light <- theme_color |>
+        grDevices::adjustcolor(0.1) |>
+        ivo_hex8_to_hex6()
+
+    table <- table |>
+        opt_horizontal_padding(scale = 3) |>
+        opt_vertical_padding(scale = 1.5) |>
+        fmt_number(columns = where(is.double), decimals = 1) |>
+        fmt_integer(columns = where(is.integer)) |>
+        cols_align(align = "right", columns = everything()) |>
+        cols_align(align = "left", columns = where(is.character)) |>
+        tab_options(
+            table.font.names = font_name,
+            table.font.color = "black",
+            heading.title.font.size = "150%",
+            heading.subtitle.font.size = "100%",
+            heading.padding = "4px",
+            column_labels.font.weight = "bold",
+            column_labels.border.top.width = "4px",
+            column_labels.border.top.style = ifelse(is.null(table[["_heading"]]$title), "hidden", "solid"),
+            column_labels.padding = "10px",
+            row_group.font.weight = "bold",
+            stub_row_group.border.style = "hidden",
+            column_labels.border.top.color = theme_color,
+            column_labels.border.bottom.color = theme_color,
+            row_group.border.bottom.color = theme_color_mid,
+            row_group.border.top.color = theme_color_mid,
+            row_group.border.top.width = "1px",
+            row_group.border.bottom.width = "1px",
+            row_group.background.color = theme_color_light,
+            table.border.bottom.color = theme_color_mid,
+            table_body.border.bottom.color = theme_color,
+            table_body.hlines.color = theme_color_mid,
+            table.border.top.style = "hidden",
+            stub.border.style = "hidden",
+            source_notes.border.bottom.style = "hidden",
+            source_notes.font.size = "75%",
+            source_notes.padding = "10px",
+            table.width = "auto"
+        ) |>
+        tab_style(
+            style = list(cell_text(weight = "bold", align = "left")),
+            locations = cells_title(groups = "title")
+        ) |>
+        tab_style(
+            style = list(cell_text(align = "left", color = grDevices::adjustcolor("black", 0.85) |>
+                ivo_hex8_to_hex6())),
+            locations = cells_title(groups = "subtitle")
+        )
+
+    return(table)
 }

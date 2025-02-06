@@ -27,6 +27,7 @@ Imports:
     checkmate,
     gt,
     officer,
+    purrr,
     tidyr
 Suggests: 
     knitr,
