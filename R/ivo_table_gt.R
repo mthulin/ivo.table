@@ -114,11 +114,14 @@ group_and_count <- function(df, columns) {
 #' @noRd
 #' @importFrom dplyr mutate across where
 #' @importFrom tidyr replace_na
+#' @importFrom purrr set_names
 missing_string_and_zeros <- function(df, missing_string) {
-    df |> mutate(
-        across(where(~ is.character(.) | is.factor(.)), ~ replace_na(as.character(.), missing_string)),
-        across(where(is.numeric), ~ replace_na(.x, 0))
-    )
+    df |>
+        mutate(
+            across(where(~ is.character(.x) | is.factor(.x)), ~ replace_na(as.character(.x), missing_string)),
+            across(where(is.numeric), ~ replace_na(.x, 0))
+        ) |>
+        set_names(ifelse(names(df) == "NA", missing_string, names(df)))
 }
 
 
