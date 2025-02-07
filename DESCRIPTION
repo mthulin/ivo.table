@@ -18,7 +18,7 @@ Description: Nicely formatted frequency tables and contingency tables (1-way, 2-
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-URL: https://github.com/mthulin/ivo.table
+URL: https://github.com/mthulin/ivo.table, https://mthulin.github.io/ivo.table/
 BugReports: https://github.com/mthulin/ivo.table/issues
 RoxygenNote: 7.3.2
 Imports: 

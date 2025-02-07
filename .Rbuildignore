@@ -5,3 +5,7 @@
 ^LICENSE\.md$
 ^CRAN-SUBMISSION$
 ^.github$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^\.github$
