@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
-
+<img src="man/figures/logo.png" align="right" width="350" />
 ## Background
 R has some great packages for creating nice-looking tables. Packages like `gt` and `flextable` allow the user to create a wide range of tables, with lots of flexibility in how these are presented and formatted. The downside to these Swiss army knife-style packages is that simple tasks, like creating a frequency table, require a lot of typing. Enter `ivo.table`, a package for creating great-looking frequency tables and contingency tables without any hassle.
 
