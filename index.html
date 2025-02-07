@@ -13,6 +13,7 @@
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Nicely Formatted Contingency Tables and Frequency Tables">
 <meta name="description" content="Nicely formatted frequency tables and contingency tables (1-way, 2-way, 3-way and 4-way tables), that can easily be exported to HTML or Office documents. Designed to work with pipes.">
 <meta property="og:description" content="Nicely formatted frequency tables and contingency tables (1-way, 2-way, 3-way and 4-way tables), that can easily be exported to HTML or Office documents. Designed to work with pipes.">
+<meta property="og:image" content="https://mthulin.github.io/ivo.table/logo.png">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -52,7 +53,13 @@
   </div>
 </nav><div class="container template-home">
 <div class="row">
-  <main id="main" class="col-md-9"><p><img src="reference/figures/logo.png" align="right" width="350"> # ivo.table This R package provides functions for easily creating nicely formatted frequency tables and contingency tables (cross-tables), that are straightforward to export to HTML or Office documents. It can do 1-way tables (wide or long), 2-way tables, 3-way tables and 4-way tables. It is based on <code>flextable</code>.</p>
+  <main id="main" class="col-md-9"><div class="section level1">
+<div class="page-header">
+<img src="logo.png" class="logo" alt=""><h1 id="ivotable">ivo.table<a class="anchor" aria-label="anchor" href="#ivotable"></a>
+</h1>
+</div>
+<p><img src="reference/figures/logo.png" align="right" width="350"></p>
+<p>This R package provides functions for easily creating nicely formatted frequency tables and contingency tables (cross-tables), that are straightforward to export to HTML or Office documents. It can do 1-way tables (wide or long), 2-way tables, 3-way tables and 4-way tables. It is based on <code>flextable</code>.</p>
 <p>The package was developed at <a href="https://www.ivo.se" class="external-link">IVO</a>, The Health and Social Care Inspectorate in Sweden.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -181,7 +188,7 @@ flextable::footnote(i = 2, j = c(1, 3),
 <pre><code><span><span class="fu"><a href="reference/ivo_table_masked.html">ivo_table_masked</a></span><span class="op">(</span><span class="va">data4</span>, colsums <span class="op">=</span> <span class="cn">TRUE</span>, rowsums <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">flextable</span><span class="fu">::</span><span class="fu"><a href="https://davidgohel.github.io/flextable/reference/save_as_docx.html" class="external-link">save_as_docx</a></span><span class="op">(</span>path <span class="op">=</span> <span class="st">"example_table.docx"</span><span class="op">)</span></span></code></pre>
 </div>
 </div>
-
+</div>
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
