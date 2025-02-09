@@ -27,11 +27,11 @@ ivo_table_gt(
 
 \item{source_note}{An optional string for a table source note.}
 
-\item{mask}{WIP}
+\item{mask}{An optional integer to mask counts below given value.}
 
 \item{missing_string}{A string used to indicate missing values. Defaults to "(Missing)".}
 
-\item{totals}{WIP}
+\item{totals}{An optional vector to add sums to "rows" and "cols".}
 }
 \value{
 A stylized \code{GT} table.

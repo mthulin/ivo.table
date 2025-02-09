@@ -3,12 +3,12 @@
 #' @description \code{ivo_table_gt()} lets you easily create a GT table using pretty fonts and colors.
 #' @param df A data frame with 1-3 columns
 #' @param extra_header Should the variable name be displayed? Defaults to TRUE.
-#' @param totals WIP
+#' @param totals An optional vector to add sums to "rows" and "cols".
 #' @param missing_string A string used to indicate missing values. Defaults to "(Missing)".
 #' @param title An optional string containing a table title.
 #' @param subtitle An optional string containing a table subtitle. Only usable together with title.
 #' @param source_note An optional string for a table source note.
-#' @param mask WIP
+#' @param mask An optional integer to mask counts below given value.
 #' @return A stylized \code{GT} table.
 #' @details The functions \code{ivo_table_gt()} takes a \code{data.frame} with 1-3 columns. The order of the columns in the \code{data.frame} will determine where they will be displayed in the table. The first column will always be displayed at the top of the table. If there are more than one column the following 2-3 columns will be displayed to the left in order. To change how the columns are displayed in the table; change the place of the columns in the \code{data.frame} using \code{dplyr::select()}.
 #' @author Stefan Furne
@@ -33,7 +33,8 @@ ivo_table_gt <- function(df,
     # Prepare the data
     df <- df |>
         group_and_count(columns) |>
-        missing_string_and_zeros(missing_string)
+        missing_string_and_zeros(missing_string) |>
+        add_totals(totals, columns)
 
     # Create the GT table object
     # If it's a 2-way or 3-way table we'll set the row name and group name
@@ -46,7 +47,7 @@ ivo_table_gt <- function(df,
             gt_table <- gt_table |> tab_stubhead(columns[2])
         }
     } else {
-        gt_table <- gt(df)
+        gt_table <- gt(df, rowname_col = columns[1]) # This is needed to make the bold totals work with 1-way table
     }
 
     # Apply optionals
@@ -58,9 +59,10 @@ ivo_table_gt <- function(df,
         }
     }
 
-    if (extra_header) {
+    # Don't draw the spanner over "Total"
+    if (extra_header & num_vars > 1) {
         gt_table <- gt_table |>
-            tab_spanner(label = columns[1], columns = setdiff(names(df), columns))
+            tab_spanner(label = columns[1], columns = setdiff(names(df), c(columns, "Total")))
     }
 
     if (is.character(source_note)) {
@@ -72,6 +74,44 @@ ivo_table_gt <- function(df,
     gt_table <- apply_gt_table_theme(gt_table)
 
     return(gt_table)
+}
+
+#' @title Add totals for columns and rows to a \code{data.frame}
+#' @description Adds totals for columns and rows to a \code{data.frame} to be used as a GT object
+#' @param df A \code{data.frame} object.
+#' @param totals A character vector of that may contain "cols" and "rows".
+#' @param columns A character vector of column names.
+#' @return A \code{data.frame} with grouped and summarized counts.
+#' @noRd
+#' @importFrom dplyr group_by summarize across mutate bind_rows rowwise ungroup c_across
+#' @importFrom tidyr replace_na
+add_totals <- function(df, totals, columns) {
+    if ("rows" %in% totals) {
+        df <- df |>
+            rowwise() |>
+            mutate(Total = sum(c_across(where(is.numeric)))) |>
+            ungroup()
+    }
+    if ("cols" %in% totals) {
+        if (length(columns) == 3) {
+            sums <- df |>
+                group_by(.data[[columns[2]]]) |>
+                summarize(across(where(is.numeric), sum), .groups = "drop")
+
+            sums[[columns[3]]] <- "Total"
+
+            df <- df |>
+                bind_rows(sums)
+        } else {
+            sums <- df |>
+                summarize(across(where(is.numeric), sum))
+            df <- df |>
+                bind_rows(sums) |>
+                mutate(across(where(is.character), ~ replace_na(.x, "Total")))
+        }
+    }
+
+    return(df)
 }
 
 #' @title Grouped and summarized \code{data.frame}
@@ -87,7 +127,7 @@ group_and_count <- function(df, columns) {
     # Group and count columns
     df <- df |>
         group_by(across(all_of(columns))) |>
-        summarize(n = n(), .groups = "drop")
+        summarize(Count = n(), .groups = "drop")
 
     # Handle 2-way or 3-way tables
     if (length(columns) %in% c(2, 3)) {
@@ -100,7 +140,7 @@ group_and_count <- function(df, columns) {
         # Join back to original df and pivot
         df <- all_combinations |>
             left_join(df, by = columns) |>
-            pivot_wider(names_from = first(columns), values_from = "n")
+            pivot_wider(names_from = first(columns), values_from = "Count")
     }
 
     return(df)
@@ -133,7 +173,7 @@ missing_string_and_zeros <- function(df, missing_string) {
 #' @return A styled \code{gt} table.
 #' @noRd
 #' @importFrom gt opt_horizontal_padding opt_vertical_padding fmt_number fmt_integer tab_options
-#' @importFrom gt sub_missing cols_align tab_style cells_title cells_body cells_stub cells_column_labels
+#' @importFrom gt cols_align tab_style cells_title cells_body cells_stub cells_column_labels cell_text matches
 #' @importFrom dplyr all_of
 apply_gt_table_theme <- function(table, color = "darkgreen", font_name = "Arial") {
     # TODO Add checkmate collection
@@ -192,6 +232,14 @@ apply_gt_table_theme <- function(table, color = "darkgreen", font_name = "Arial"
             style = list(cell_text(align = "left", color = grDevices::adjustcolor("black", 0.85) |>
                 ivo_hex8_to_hex6())),
             locations = cells_title(groups = "subtitle")
+        ) |>
+        tab_style(
+            style = cell_text(weight = "bold"),
+            locations = list(
+                cells_stub(rows = matches("Total")),
+                cells_body(columns = matches("Total")),
+                cells_body(rows = matches("Total"))
+            )
         )
 
     return(table)
