@@ -14,7 +14,7 @@
 #' @details The functions \code{ivo_table_gt()} takes a \code{data.frame} with 1-3 columns. The order of the columns in the \code{data.frame} will determine where they will be displayed in the table. The first column will always be displayed at the top of the table. If there are more than one column the following 2-3 columns will be displayed to the left in order. To change how the columns are displayed in the table; change the place of the columns in the \code{data.frame} using \code{dplyr::select()}.
 #' @author Stefan Furne
 #' @encoding UTF-8
-#' @importFrom gt gt tab_header tab_spanner tab_source_note tab_stubhead
+#' @importFrom gt gt tab_header tab_spanner tab_source_note tab_stubhead matches cols_align
 #' @importFrom checkmate makeAssertCollection reportAssertions assert_data_frame assert_choice assert_string assert_numeric assert_character assert_true
 #' @export
 #' @seealso {ivo_gt_theme}
@@ -152,6 +152,12 @@ ivo_table_gt <- function(df,
 
     # Apply theming
     gt_table <- ivo_gt_theme(gt_table, color = color, font_name = font_name)
+
+    if (!is.null(mask)) {
+        # Align masked values to the right
+        gt_table <- gt_table |>
+            cols_align(align = "right", columns = matches(setdiff(c(names(df), "Total"), columns)))
+    }
 
     return(gt_table)
 }
