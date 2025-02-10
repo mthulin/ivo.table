@@ -25,7 +25,9 @@ Imports:
     dplyr,
     flextable,
     checkmate,
+    gt,
     officer,
+    purrr,
     tidyr
 Suggests: 
     knitr,
