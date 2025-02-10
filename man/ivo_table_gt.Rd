@@ -7,6 +7,7 @@
 \usage{
 ivo_table_gt(
   df,
+  color = "darkgreen",
   title = NULL,
   subtitle = NULL,
   extra_header = TRUE,
@@ -18,6 +19,8 @@ ivo_table_gt(
 }
 \arguments{
 \item{df}{A data frame with 1-3 columns}
+
+\item{color}{A named color or a color HEX code, used for the lines in the table. Defaults to "darkgreen".}
 
 \item{title}{An optional string containing a table title.}
 
@@ -41,6 +44,72 @@ A stylized \code{GT} table.
 }
 \details{
 The functions \code{ivo_table_gt()} takes a \code{data.frame} with 1-3 columns. The order of the columns in the \code{data.frame} will determine where they will be displayed in the table. The first column will always be displayed at the top of the table. If there are more than one column the following 2-3 columns will be displayed to the left in order. To change how the columns are displayed in the table; change the place of the columns in the \code{data.frame} using \code{dplyr::select()}.
+}
+\examples{
+# Generate example data
+example_data <- data.frame(
+    Year = sample(2020:2023, 50, replace = TRUE),
+    A = sample(c("Type 1", "Type 2"), 50, replace = TRUE),
+    B = sample(c("Apples", "Oranges", "Bananas"), 50, replace = TRUE),
+    C = sample(c("Swedish", "Norwegian", "Chilean"), 50, replace = TRUE)
+)
+
+### 1 way tables ###
+data1 <- example_data |> dplyr::select(Year)
+
+ivo_table_gt(data1)
+ivo_table_gt(data1, extra_header = FALSE) # Remove the header
+ivo_table_gt(data1, color = "orange") # Change color on table lines
+
+ivo_table_gt(data1, mask = 15) # Counts below <=15 are masked
+
+# With pipes
+example_data |>
+    dplyr::select(Year) |>
+    ivo_table_gt()
+
+### 2-way tables ###
+data2 <- example_data |> dplyr::select(A, B)
+data2_swap <- example_data |> dplyr::select(B, A)
+
+# Basic tables:
+ivo_table_gt(data2)
+ivo_table_gt(data2_swap) # Swap order of the columns
+ivo_table_gt(data2, sums = "cols") # Add the sum of each column
+ivo_table_gt(data2, sums = "rows") # Add the sum of each row
+ivo_table_gt(data2, title = "Awesome table") # Add a title
+ivo_table_gt(data2,
+    title = "Awesome table",
+    subtitle = "It's really awesome"
+) # Add a subtitle for the title
+
+# Masked tables:
+ivo_table_gt(data2, mask = 7) # Counts <= 7 are masked
+# Row and column sums are also masked:
+ivo_table_gt(
+    data2,
+    mask = 3,
+    sums = c("cols", "rows"),
+)
+
+# Add a note at the end of the table:
+# (colwidths must be set to the number of columns in the table)
+ivo_table_gt(data2, source_note = "This is a footnote.")
+
+### 3-way tables ###
+data3 <- example_data |> dplyr::select(C, B, Year)
+
+ivo_table_gt(data3)
+ivo_table_gt(data3, sums = c("cols", "rows")) # Add the sum of each column and each row
+
+ivo_table_gt(
+    data3,
+    mask = 3,
+    title = "Values between 1 and 3 are masked."
+)
+}
+\seealso{
+{ivo_gt_theme}
 }
 \author{
 Stefan Furne

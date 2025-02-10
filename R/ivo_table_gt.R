@@ -2,6 +2,7 @@
 #' @name ivo_table_gt
 #' @description \code{ivo_table_gt()} lets you easily create a GT table using pretty fonts and colors.
 #' @param df A data frame with 1-3 columns
+#' @param color A named color or a color HEX code, used for the lines in the table. Defaults to "darkgreen".
 #' @param extra_header Should the variable name be displayed? Defaults to TRUE.
 #' @param sums An optional vector to add sums to "rows" and "cols".
 #' @param missing_string A string used to indicate missing values. Defaults to "(Missing)".
@@ -16,8 +17,71 @@
 #' @importFrom gt gt tab_header tab_spanner tab_source_note tab_stubhead
 #' @importFrom checkmate makeAssertCollection reportAssertions assert_data_frame assert_choice assert_string assert_numeric assert_character assert_true
 #' @export
-# TODO examples
+#' @seealso {ivo_gt_theme}
+#' @examples
+#' # Generate example data
+#' example_data <- data.frame(
+#'     Year = sample(2020:2023, 50, replace = TRUE),
+#'     A = sample(c("Type 1", "Type 2"), 50, replace = TRUE),
+#'     B = sample(c("Apples", "Oranges", "Bananas"), 50, replace = TRUE),
+#'     C = sample(c("Swedish", "Norwegian", "Chilean"), 50, replace = TRUE)
+#' )
+#'
+#' ### 1 way tables ###
+#' data1 <- example_data |> dplyr::select(Year)
+#'
+#' ivo_table_gt(data1)
+#' ivo_table_gt(data1, extra_header = FALSE) # Remove the header
+#' ivo_table_gt(data1, color = "orange") # Change color on table lines
+#'
+#' ivo_table_gt(data1, mask = 15) # Counts below <=15 are masked
+#'
+#' # With pipes
+#' example_data |>
+#'     dplyr::select(Year) |>
+#'     ivo_table_gt()
+#'
+#' ### 2-way tables ###
+#' data2 <- example_data |> dplyr::select(A, B)
+#' data2_swap <- example_data |> dplyr::select(B, A)
+#'
+#' # Basic tables:
+#' ivo_table_gt(data2)
+#' ivo_table_gt(data2_swap) # Swap order of the columns
+#' ivo_table_gt(data2, sums = "cols") # Add the sum of each column
+#' ivo_table_gt(data2, sums = "rows") # Add the sum of each row
+#' ivo_table_gt(data2, title = "Awesome table") # Add a title
+#' ivo_table_gt(data2,
+#'     title = "Awesome table",
+#'     subtitle = "It's really awesome"
+#' ) # Add a subtitle for the title
+#'
+#' # Masked tables:
+#' ivo_table_gt(data2, mask = 7) # Counts <= 7 are masked
+#' # Row and column sums are also masked:
+#' ivo_table_gt(
+#'     data2,
+#'     mask = 3,
+#'     sums = c("cols", "rows"),
+#' )
+#'
+#' # Add a note at the end of the table:
+#' # (colwidths must be set to the number of columns in the table)
+#' ivo_table_gt(data2, source_note = "This is a footnote.")
+#'
+#' ### 3-way tables ###
+#' data3 <- example_data |> dplyr::select(C, B, Year)
+#'
+#' ivo_table_gt(data3)
+#' ivo_table_gt(data3, sums = c("cols", "rows")) # Add the sum of each column and each row
+#'
+#' ivo_table_gt(
+#'     data3,
+#'     mask = 3,
+#'     title = "Values between 1 and 3 are masked."
+#' )
 ivo_table_gt <- function(df,
+                         color = "darkgreen",
                          title = NULL,
                          subtitle = NULL,
                          extra_header = TRUE,
@@ -28,8 +92,9 @@ ivo_table_gt <- function(df,
     coll <- makeAssertCollection()
 
     assert_data_frame(df, min.cols = 1, max.cols = 3, add = coll)
+    assert_character(color, null.ok = FALSE, min.len = 1, max.len = 1, add = coll)
     assert_choice(extra_header, c(TRUE, FALSE), add = coll)
-    assert_character(sums, any.missing = FALSE, min.len = 1, max.len = 2, add = coll)
+    assert_character(sums, null.ok = TRUE, any.missing = FALSE, min.len = 1, max.len = 2, add = coll)
     assert_true(all(sums %in% c("cols", "rows")), add = coll)
     assert_string(title, null.ok = TRUE, add = coll)
     assert_string(subtitle, null.ok = TRUE, add = coll)
@@ -133,12 +198,13 @@ add_sums <- function(df, sums, columns) {
 #' @param columns A character vector of column names.
 #' @return A \code{data.frame} with grouped and summarized counts.
 #' @noRd
-#' @importFrom dplyr group_by reframe summarize left_join across all_of first n distinct select
+#' @importFrom dplyr group_by reframe summarize left_join across all_of first n distinct select mutate
 #' @importFrom tidyr pivot_wider expand_grid everything
 #' @importFrom purrr map set_names reduce
 group_and_count <- function(df, columns) {
     # Group and count columns
     df <- df |>
+        mutate(across(everything(), as.character)) |>
         group_by(across(all_of(columns))) |>
         summarize(Count = n(), .groups = "drop")
 
@@ -195,7 +261,8 @@ mask_values <- function(df, upper_limit) {
         mutate(across(
             where(is.numeric),
             ~ ifelse(between(.x, 1, upper_limit), mask_value, .x)
-        ))
+        )) |>
+        mutate(across(everything(), as.character))
 
     # Handle "Total" column separately if it exists
     if ("Total" %in% names(masked_df)) {
@@ -247,11 +314,22 @@ mask_col_sums <- function(df, mask_value) {
 #' @param color A named color or a color HEX code, used for the lines in the table. Defaults to "darkgreen".
 #' @param font_name The name of the font to be used in the table. Defaults to "Arial".
 #' @return A styled \code{gt} table.
+#' @author Stefan Furne
+#' @encoding UTF-8
 #' @export
 #' @importFrom gt opt_horizontal_padding opt_vertical_padding fmt_number fmt_integer tab_options
 #' @importFrom gt cols_align tab_style cells_title cells_body cells_stub cells_column_labels cell_text matches
 #' @importFrom dplyr all_of
+#' @importFrom checkmate makeAssertCollection reportAssertions assert_class assert_string
 ivo_gt_theme <- function(table, color = "darkgreen", font_name = "Arial") {
+    coll <- makeAssertCollection()
+
+    assert_class(table, "gt_tbl")
+    assert_string(color, add = coll)
+    assert_string(font_name, add = coll)
+
+    reportAssertions(coll)
+
     # Get theme colors
     # TODO This should probably be a shared internal function with flextable
     color_mid <- color |>
