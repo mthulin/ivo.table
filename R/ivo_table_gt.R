@@ -125,7 +125,7 @@ ivo_table_gt <- function(df,
             gt_table <- gt_table |> tab_stubhead(columns[2])
         }
     } else {
-        gt_table <- gt(df, rowname_col = columns[1]) # This is needed to make the bold sums work with 1-way table
+        gt_table <- gt(df, rowname_col = columns[1]) |> tab_stubhead(label = columns[1]) # This is needed to make the bold sums work with 1-way table
     }
 
     # Apply optionals
@@ -249,7 +249,7 @@ missing_string_and_zeros <- function(df, missing_string) {
 #' @param upper_limit A numeric value as the upper limit of values to mask.
 #' @return A \code{data.frame} with values masked according to the specified limit.
 #' @noRd
-#' @importFrom dplyr mutate across where if_else filter bind_rows between
+#' @importFrom dplyr mutate across where if_else filter bind_rows between c_across where rowwise ungroup
 mask_values <- function(df, upper_limit) {
     if (is.null(upper_limit)) {
         return(df)
