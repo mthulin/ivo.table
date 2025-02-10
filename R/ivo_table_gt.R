@@ -3,6 +3,7 @@
 #' @description \code{ivo_table_gt()} lets you easily create a GT table using pretty fonts and colors.
 #' @param df A data frame with 1-3 columns
 #' @param color A named color or a color HEX code, used for the lines in the table. Defaults to "darkgreen".
+#' @param font_name The name of the font to be used in the table. Defaults to "Arial".
 #' @param extra_header Should the variable name be displayed? Defaults to TRUE.
 #' @param sums An optional vector to add sums to "rows" and "cols".
 #' @param missing_string A string used to indicate missing values. Defaults to "(Missing)".

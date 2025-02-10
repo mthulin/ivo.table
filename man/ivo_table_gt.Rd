@@ -8,6 +8,7 @@
 ivo_table_gt(
   df,
   color = "darkgreen",
+  font_name = "Arial",
   title = NULL,
   subtitle = NULL,
   extra_header = TRUE,
@@ -21,6 +22,8 @@ ivo_table_gt(
 \item{df}{A data frame with 1-3 columns}
 
 \item{color}{A named color or a color HEX code, used for the lines in the table. Defaults to "darkgreen".}
+
+\item{font_name}{The name of the font to be used in the table. Defaults to "Arial".}
 
 \item{title}{An optional string containing a table title.}
 
