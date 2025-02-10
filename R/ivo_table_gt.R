@@ -82,6 +82,7 @@
 #' )
 ivo_table_gt <- function(df,
                          color = "darkgreen",
+                         font_name = "Arial",
                          title = NULL,
                          subtitle = NULL,
                          extra_header = TRUE,
@@ -99,6 +100,7 @@ ivo_table_gt <- function(df,
     assert_string(title, null.ok = TRUE, add = coll)
     assert_string(subtitle, null.ok = TRUE, add = coll)
     assert_string(missing_string, add = coll)
+    assert_string(font_name, add = coll)
     assert_numeric(mask, lower = 1, max.len = 1, null.ok = TRUE, add = coll)
 
     reportAssertions(coll)
@@ -149,7 +151,7 @@ ivo_table_gt <- function(df,
     }
 
     # Apply theming
-    gt_table <- ivo_gt_theme(gt_table)
+    gt_table <- ivo_gt_theme(gt_table, color = color, font_name = font_name)
 
     return(gt_table)
 }
