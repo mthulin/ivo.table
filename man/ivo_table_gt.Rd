@@ -13,7 +13,7 @@ ivo_table_gt(
   source_note = NULL,
   mask = NULL,
   missing_string = "(Missing)",
-  totals = NULL
+  sums = NULL
 )
 }
 \arguments{
@@ -31,7 +31,7 @@ ivo_table_gt(
 
 \item{missing_string}{A string used to indicate missing values. Defaults to "(Missing)".}
 
-\item{totals}{An optional vector to add sums to "rows" and "cols".}
+\item{sums}{An optional vector to add sums to "rows" and "cols".}
 }
 \value{
 A stylized \code{GT} table.

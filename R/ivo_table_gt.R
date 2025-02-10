@@ -3,7 +3,7 @@
 #' @description \code{ivo_table_gt()} lets you easily create a GT table using pretty fonts and colors.
 #' @param df A data frame with 1-3 columns
 #' @param extra_header Should the variable name be displayed? Defaults to TRUE.
-#' @param totals An optional vector to add sums to "rows" and "cols".
+#' @param sums An optional vector to add sums to "rows" and "cols".
 #' @param missing_string A string used to indicate missing values. Defaults to "(Missing)".
 #' @param title An optional string containing a table title.
 #' @param subtitle An optional string containing a table subtitle. Only usable together with title.
@@ -14,6 +14,7 @@
 #' @author Stefan Furne
 #' @encoding UTF-8
 #' @importFrom gt gt tab_header tab_spanner tab_source_note tab_stubhead
+#' @importFrom checkmate makeAssertCollection reportAssertions assert_data_frame assert_choice assert_string assert_numeric assert_character assert_true
 #' @export
 # TODO examples
 ivo_table_gt <- function(df,
@@ -23,18 +24,29 @@ ivo_table_gt <- function(df,
                          source_note = NULL,
                          mask = NULL,
                          missing_string = "(Missing)",
-                         totals = NULL) {
+                         sums = NULL) {
+    coll <- makeAssertCollection()
+
+    assert_data_frame(df, min.cols = 1, max.cols = 3, add = coll)
+    assert_choice(extra_header, c(TRUE, FALSE), add = coll)
+    assert_character(sums, any.missing = FALSE, min.len = 1, max.len = 2, add = coll)
+    assert_true(all(sums %in% c("cols", "rows")), add = coll)
+    assert_string(title, null.ok = TRUE, add = coll)
+    assert_string(subtitle, null.ok = TRUE, add = coll)
+    assert_string(missing_string, add = coll)
+    assert_numeric(mask, lower = 1, max.len = 1, null.ok = TRUE, add = coll)
+
+    reportAssertions(coll)
+
     # Capture the columns present
     columns <- names(df)
     num_vars <- length(columns)
-
-    if (num_vars > 3) stop("The GT table function supports a maximum of three variables (3-way table).")
 
     # Prepare the data
     df <- df |>
         group_and_count(columns) |>
         missing_string_and_zeros(missing_string) |>
-        add_totals(totals, columns) |>
+        add_sums(sums, columns) |>
         mask_values(mask)
 
     # Create the GT table object
@@ -48,7 +60,7 @@ ivo_table_gt <- function(df,
             gt_table <- gt_table |> tab_stubhead(columns[2])
         }
     } else {
-        gt_table <- gt(df, rowname_col = columns[1]) # This is needed to make the bold totals work with 1-way table
+        gt_table <- gt(df, rowname_col = columns[1]) # This is needed to make the bold sums work with 1-way table
     }
 
     # Apply optionals
@@ -72,42 +84,42 @@ ivo_table_gt <- function(df,
     }
 
     # Apply theming
-    gt_table <- apply_gt_table_theme(gt_table)
+    gt_table <- ivo_gt_theme(gt_table)
 
     return(gt_table)
 }
 
-#' @title Add totals for columns and rows to a \code{data.frame}
-#' @description Adds totals for columns and rows to a \code{data.frame} to be used as a GT object
+#' @title Add sums for columns and rows to a \code{data.frame}
+#' @description Adds sums for columns and rows to a \code{data.frame} to be used as a GT object
 #' @param df A \code{data.frame} object.
-#' @param totals A character vector of that may contain "cols" and "rows".
+#' @param sums A character vector of that may contain "cols" and "rows".
 #' @param columns A character vector of column names.
 #' @return A \code{data.frame} with grouped and summarized counts.
 #' @noRd
 #' @importFrom dplyr group_by summarize across mutate bind_rows rowwise ungroup c_across
 #' @importFrom tidyr replace_na
-add_totals <- function(df, totals, columns) {
-    if ("rows" %in% totals) {
+add_sums <- function(df, sums, columns) {
+    if ("rows" %in% sums) {
         df <- df |>
             rowwise() |>
             mutate(Total = sum(c_across(where(is.numeric)))) |>
             ungroup()
     }
-    if ("cols" %in% totals) {
+    if ("cols" %in% sums) {
         if (length(columns) == 3) {
-            sums <- df |>
+            sum_rows <- df |>
                 group_by(.data[[columns[2]]]) |>
                 summarize(across(where(is.numeric), sum), .groups = "drop")
 
-            sums[[columns[3]]] <- "Total"
+            sum_rows[[columns[3]]] <- "Total"
 
             df <- df |>
-                bind_rows(sums)
+                bind_rows(sum_rows)
         } else {
-            sums <- df |>
+            sum_rows <- df |>
                 summarize(across(where(is.numeric), sum))
             df <- df |>
-                bind_rows(sums) |>
+                bind_rows(sum_rows) |>
                 mutate(across(where(is.character), ~ replace_na(.x, "Total")))
         }
     }
@@ -204,24 +216,24 @@ mask_values <- function(df, upper_limit) {
         masked_df <- bind_rows(lapply(groups, function(g) {
             masked_df |>
                 filter(.data[[group_var]] == g) |>
-                mask_col_totals(mask_value)
+                mask_col_sums(mask_value)
         }))
     } else if (sum_rows == 1) {
         # Just one "Total" assumes a 1-way or 2-way table
-        masked_df <- mask_col_totals(masked_df, mask_value)
+        masked_df <- mask_col_sums(masked_df, mask_value)
     }
 
     return(masked_df)
 }
 
-#' @title Mask column totals
-#' @description Ensures that column totals do not accidentally reveal masked values.
+#' @title Mask column sums
+#' @description Ensures that column sums do not accidentally reveal masked values.
 #' @param df A \code{data.frame} object.
 #' @param mask_value A string value that represents the masked value (e.g., "1-5").
-#' @return A \code{data.frame} with column totals masked (replaced by "-" if applicable).
+#' @return A \code{data.frame} with column sums masked (replaced by "-" if applicable).
 #' @noRd
 #' @importFrom dplyr mutate across where if_else row_number n
-mask_col_totals <- function(df, mask_value) {
+mask_col_sums <- function(df, mask_value) {
     df |>
         mutate(across(
             !matches("Total"),
@@ -235,24 +247,21 @@ mask_col_totals <- function(df, mask_value) {
 #' @param color A named color or a color HEX code, used for the lines in the table. Defaults to "darkgreen".
 #' @param font_name The name of the font to be used in the table. Defaults to "Arial".
 #' @return A styled \code{gt} table.
-#' @noRd
+#' @export
 #' @importFrom gt opt_horizontal_padding opt_vertical_padding fmt_number fmt_integer tab_options
 #' @importFrom gt cols_align tab_style cells_title cells_body cells_stub cells_column_labels cell_text matches
 #' @importFrom dplyr all_of
-apply_gt_table_theme <- function(table, color = "darkgreen", font_name = "Arial") {
-    # TODO Add checkmate collection
-
+ivo_gt_theme <- function(table, color = "darkgreen", font_name = "Arial") {
     # Get theme colors
     # TODO This should probably be a shared internal function with flextable
-    theme_color <- color
-    theme_color_mid <- theme_color |>
+    color_mid <- color |>
         grDevices::adjustcolor(0.4) |>
         ivo_hex8_to_hex6()
-    theme_color_light <- theme_color |>
+    color_light <- color |>
         grDevices::adjustcolor(0.1) |>
         ivo_hex8_to_hex6()
 
-    table <- table |>
+    table |>
         opt_horizontal_padding(scale = 3) |>
         opt_vertical_padding(scale = 1.5) |>
         fmt_number(columns = where(is.double), decimals = 1) |>
@@ -271,16 +280,16 @@ apply_gt_table_theme <- function(table, color = "darkgreen", font_name = "Arial"
             column_labels.padding = "10px",
             row_group.font.weight = "bold",
             stub_row_group.border.style = "hidden",
-            column_labels.border.top.color = theme_color,
-            column_labels.border.bottom.color = theme_color,
-            row_group.border.bottom.color = theme_color_mid,
-            row_group.border.top.color = theme_color_mid,
+            column_labels.border.top.color = color,
+            column_labels.border.bottom.color = color,
+            row_group.border.bottom.color = color_mid,
+            row_group.border.top.color = color_mid,
             row_group.border.top.width = "1px",
             row_group.border.bottom.width = "1px",
-            row_group.background.color = theme_color_light,
-            table.border.bottom.color = theme_color_mid,
-            table_body.border.bottom.color = theme_color,
-            table_body.hlines.color = theme_color_mid,
+            row_group.background.color = color_light,
+            table.border.bottom.color = color_mid,
+            table_body.border.bottom.color = color,
+            table_body.hlines.color = color_mid,
             table.border.top.style = "hidden",
             stub.border.style = "hidden",
             source_notes.border.bottom.style = "hidden",
@@ -305,6 +314,4 @@ apply_gt_table_theme <- function(table, color = "darkgreen", font_name = "Arial"
                 cells_body(rows = matches("Total"))
             )
         )
-
-    return(table)
 }
