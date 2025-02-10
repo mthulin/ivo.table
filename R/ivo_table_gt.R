@@ -21,7 +21,7 @@ ivo_table_gt <- function(df,
                          subtitle = NULL,
                          extra_header = TRUE,
                          source_note = NULL,
-                         mask = FALSE,
+                         mask = NULL,
                          missing_string = "(Missing)",
                          totals = NULL) {
     # Capture the columns present
@@ -34,7 +34,8 @@ ivo_table_gt <- function(df,
     df <- df |>
         group_and_count(columns) |>
         missing_string_and_zeros(missing_string) |>
-        add_totals(totals, columns)
+        add_totals(totals, columns) |>
+        mask_values(mask)
 
     # Create the GT table object
     # If it's a 2-way or 3-way table we'll set the row name and group name
@@ -147,7 +148,7 @@ group_and_count <- function(df, columns) {
 }
 
 #' @title Replace missing values in a \code{data.frame}
-#' @description Replaces missing values in a `data.frame` by assigning a custom string to character or factor columns, and replacing missing numeric values with zeros.
+#' @description Replaces missing values in a \code{data.frame} by assigning a custom string to character or factor columns, and replacing missing numeric values with zeros.
 #' @param df A \code{data.frame} object.
 #' @param missing_string A string to replace missing values in character or factor columns.
 #' @return A \code{data.frame} with missing values replaced according to the specified rules.
@@ -164,6 +165,69 @@ missing_string_and_zeros <- function(df, missing_string) {
         set_names(ifelse(names(df) == "NA", missing_string, names(df)))
 }
 
+#' @title Mask values
+#' @description Replaces values in a \code{data.frame} equal or lower than the defined upper limit.
+#' @param df A \code{data.frame} object.
+#' @param upper_limit A numeric value as the upper limit of values to mask.
+#' @return A \code{data.frame} with values masked according to the specified limit.
+#' @noRd
+#' @importFrom dplyr mutate across where if_else filter bind_rows between
+mask_values <- function(df, upper_limit) {
+    if (is.null(upper_limit)) {
+        return(df)
+    }
+
+    mask_value <- paste(1, upper_limit, sep = "-")
+
+    masked_df <- df |>
+        mutate(across(
+            where(is.numeric),
+            ~ ifelse(between(.x, 1, upper_limit), mask_value, .x)
+        ))
+
+    # Handle "Total" column separately if it exists
+    if ("Total" %in% names(masked_df)) {
+        masked_df <- masked_df |>
+            mutate(Total = if_else(.data$Total == mask_value,
+                "-",
+                .data$Total
+            ))
+    }
+
+    # Handle row grouping logic based on "Total" in first column
+    sum_rows <- sum(rowSums(masked_df == "Total", na.rm = TRUE) > 0)
+
+    # If there's more than one row containing "Total", there's subtotals to be handled groupwise
+    if (sum_rows > 1) {
+        groups <- unique(masked_df[[1]])
+        group_var <- names(masked_df[1])
+        masked_df <- bind_rows(lapply(groups, function(g) {
+            masked_df |>
+                filter(.data[[group_var]] == g) |>
+                mask_col_totals(mask_value)
+        }))
+    } else if (sum_rows == 1) {
+        # Just one "Total" assumes a 1-way or 2-way table
+        masked_df <- mask_col_totals(masked_df, mask_value)
+    }
+
+    return(masked_df)
+}
+
+#' @title Mask column totals
+#' @description Ensures that column totals do not accidentally reveal masked values.
+#' @param df A \code{data.frame} object.
+#' @param mask_value A string value that represents the masked value (e.g., "1-5").
+#' @return A \code{data.frame} with column totals masked (replaced by "-" if applicable).
+#' @noRd
+#' @importFrom dplyr mutate across where if_else row_number n
+mask_col_totals <- function(df, mask_value) {
+    df |>
+        mutate(across(
+            !matches("Total"),
+            ~ ifelse(sum(.x == mask_value) == 1 & row_number() == n(), "-", .x)
+        ))
+}
 
 #' @title A nice GT theme
 #' @description Applies a predefined theme to a GT table, including font, colors, and alignment.

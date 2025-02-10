@@ -11,7 +11,7 @@ ivo_table_gt(
   subtitle = NULL,
   extra_header = TRUE,
   source_note = NULL,
-  mask = FALSE,
+  mask = NULL,
   missing_string = "(Missing)",
   totals = NULL
 )
