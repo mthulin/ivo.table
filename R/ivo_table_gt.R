@@ -267,10 +267,15 @@ mask_values <- function(df, upper_limit) {
     # Handle "Total" column separately if it exists
     if ("Total" %in% names(masked_df)) {
         masked_df <- masked_df |>
-            mutate(Total = if_else(.data$Total == mask_value,
-                "-",
-                .data$Total
-            ))
+            rowwise() |>
+            mutate(
+                Total = if_else(
+                    sum(c_across(where(is.character)) == mask_value, na.rm = TRUE) == 1,
+                    "-",
+                    .data$Total
+                )
+            ) |>
+            ungroup()
     }
 
     # Handle row grouping logic based on "Total" in first column
