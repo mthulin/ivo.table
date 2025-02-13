@@ -9,7 +9,7 @@ ivo_table_gt(
   df,
   color = "darkgreen",
   font_name = "Arial",
-  title = NULL,
+  caption = NULL,
   subtitle = NULL,
   extra_header = TRUE,
   source_note = NULL,
@@ -25,7 +25,7 @@ ivo_table_gt(
 
 \item{font_name}{The name of the font to be used in the table. Defaults to "Arial".}
 
-\item{title}{An optional string containing a table title.}
+\item{caption}{An optional string containing a table title.}
 
 \item{subtitle}{An optional string containing a table subtitle. Only usable together with title.}
 
@@ -80,9 +80,9 @@ ivo_table_gt(data2)
 ivo_table_gt(data2_swap) # Swap order of the columns
 ivo_table_gt(data2, sums = "cols") # Add the sum of each column
 ivo_table_gt(data2, sums = "rows") # Add the sum of each row
-ivo_table_gt(data2, title = "Awesome table") # Add a title
+ivo_table_gt(data2, caption = "Awesome table") # Add a caption
 ivo_table_gt(data2,
-    title = "Awesome table",
+    caption = "Awesome table",
     subtitle = "It's really awesome"
 ) # Add a subtitle for the title
 
@@ -108,7 +108,7 @@ ivo_table_gt(data3, sums = c("cols", "rows")) # Add the sum of each column and e
 ivo_table_gt(
     data3,
     mask = 3,
-    title = "Values between 1 and 3 are masked."
+    caption = "Values between 1 and 3 are masked."
 )
 }
 \seealso{

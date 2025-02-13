@@ -7,7 +7,7 @@
 #' @param extra_header Should the variable name be displayed? Defaults to TRUE.
 #' @param sums An optional vector to add sums to "rows" and "cols".
 #' @param missing_string A string used to indicate missing values. Defaults to "(Missing)".
-#' @param title An optional string containing a table title.
+#' @param caption An optional string containing a table title.
 #' @param subtitle An optional string containing a table subtitle. Only usable together with title.
 #' @param source_note An optional string for a table source note.
 #' @param mask An optional integer to mask counts below given value.
@@ -51,9 +51,9 @@
 #' ivo_table_gt(data2_swap) # Swap order of the columns
 #' ivo_table_gt(data2, sums = "cols") # Add the sum of each column
 #' ivo_table_gt(data2, sums = "rows") # Add the sum of each row
-#' ivo_table_gt(data2, title = "Awesome table") # Add a title
+#' ivo_table_gt(data2, caption = "Awesome table") # Add a caption
 #' ivo_table_gt(data2,
-#'     title = "Awesome table",
+#'     caption = "Awesome table",
 #'     subtitle = "It's really awesome"
 #' ) # Add a subtitle for the title
 #'
@@ -79,12 +79,12 @@
 #' ivo_table_gt(
 #'     data3,
 #'     mask = 3,
-#'     title = "Values between 1 and 3 are masked."
+#'     caption = "Values between 1 and 3 are masked."
 #' )
 ivo_table_gt <- function(df,
                          color = "darkgreen",
                          font_name = "Arial",
-                         title = NULL,
+                         caption = NULL,
                          subtitle = NULL,
                          extra_header = TRUE,
                          source_note = NULL,
@@ -98,7 +98,7 @@ ivo_table_gt <- function(df,
     assert_choice(extra_header, c(TRUE, FALSE), add = coll)
     assert_character(sums, null.ok = TRUE, any.missing = FALSE, min.len = 1, max.len = 2, add = coll)
     assert_true(all(sums %in% c("cols", "rows")), add = coll)
-    assert_string(title, null.ok = TRUE, add = coll)
+    assert_string(caption, null.ok = TRUE, add = coll)
     assert_string(subtitle, null.ok = TRUE, add = coll)
     assert_string(missing_string, add = coll)
     assert_string(font_name, add = coll)
@@ -132,11 +132,11 @@ ivo_table_gt <- function(df,
     }
 
     # Apply optionals
-    if (!is.null(title)) {
+    if (!is.null(caption)) {
         if (!is.null(subtitle)) {
-            gt_table <- gt_table |> tab_header(title = title, subtitle = subtitle)
+            gt_table <- gt_table |> tab_header(title = caption, subtitle = subtitle)
         } else {
-            gt_table <- gt_table |> tab_header(title = title)
+            gt_table <- gt_table |> tab_header(title = caption)
         }
     }
 
