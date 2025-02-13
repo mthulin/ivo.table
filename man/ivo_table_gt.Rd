@@ -80,6 +80,7 @@ ivo_table_gt(data2)
 ivo_table_gt(data2_swap) # Swap order of the columns
 ivo_table_gt(data2, sums = "cols") # Add the sum of each column
 ivo_table_gt(data2, sums = "rows") # Add the sum of each row
+ivo_table_gt(data2, sums = c("cols", "rows")) # Add the sum of each row and column
 ivo_table_gt(data2, caption = "Awesome table") # Add a caption
 ivo_table_gt(data2,
     caption = "Awesome table",
