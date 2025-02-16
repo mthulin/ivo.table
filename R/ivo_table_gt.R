@@ -265,12 +265,12 @@ mask_values <- function(df, upper_limit) {
         return(df)
     }
 
-    mask_value <- paste(1, upper_limit, sep = "-")
+    mask_value <- paste(1, format_number(upper_limit), sep = " - ")
 
     masked_df <- df |>
         mutate(across(
             where(is.numeric),
-            ~ ifelse(between(.x, 1, upper_limit), mask_value, .x)
+            ~ ifelse(between(.x, 1, upper_limit), mask_value, format_number(.x))
         )) |>
         mutate(across(everything(), as.character))
 
@@ -323,6 +323,18 @@ mask_col_sums <- function(df, mask_value) {
         ))
 }
 
+#' @title Format a number using system locale
+#' @description Formats a numeric value according to the system's locale settings.
+#' @param x A numeric vector.
+#' @return A character vector with locale-aware formatting.
+#' @noRd
+format_number <- function(x) {
+    decimal_mark <- Sys.localeconv()[["decimal_point"]]
+    big_mark <- Sys.localeconv()[["thousands_sep"]]
+
+    format(x, big.mark = big_mark, decimal.mark = decimal_mark, scientific = FALSE, trim = TRUE)
+}
+
 #' @title A nice GT theme
 #' @description Applies a predefined theme to a GT table, including font, colors, and alignment.
 #' @param table A \code{gt} object.
@@ -332,7 +344,7 @@ mask_col_sums <- function(df, mask_value) {
 #' @author Stefan Furne
 #' @encoding UTF-8
 #' @export
-#' @importFrom gt opt_horizontal_padding opt_vertical_padding fmt_number fmt_integer tab_options
+#' @importFrom gt opt_horizontal_padding opt_vertical_padding fmt_number fmt_integer fmt tab_options
 #' @importFrom gt cols_align tab_style cells_title cells_body cells_stub cells_column_labels cell_text matches
 #' @importFrom dplyr all_of
 #' @importFrom checkmate makeAssertCollection reportAssertions assert_class assert_string
@@ -358,7 +370,8 @@ ivo_gt_theme <- function(table, color = "darkgreen", font_name = "Arial") {
         opt_horizontal_padding(scale = 3) |>
         opt_vertical_padding(scale = 1.5) |>
         fmt_number(columns = where(is.double), decimals = 1) |>
-        fmt_integer(columns = where(is.integer)) |>
+        fmt_number(columns = where(is.integer), decimals = 0) |>
+        fmt(columns = where(is.numeric), fns = format_number) |>
         cols_align(align = "right", columns = everything()) |>
         cols_align(align = "left", columns = where(is.character)) |>
         tab_options(
