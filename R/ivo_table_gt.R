@@ -324,15 +324,12 @@ mask_col_sums <- function(df, mask_value) {
 }
 
 #' @title Format a number using system locale
-#' @description Formats a numeric value according to the system's locale settings.
+#' @description Formats a numeric value with thousand separation and decimal mark.
 #' @param x A numeric vector.
-#' @return A character vector with locale-aware formatting.
+#' @return A character vector.
 #' @noRd
 format_number <- function(x) {
-    decimal_mark <- Sys.localeconv()[["decimal_point"]]
-    big_mark <- Sys.localeconv()[["thousands_sep"]]
-
-    format(x, big.mark = big_mark, decimal.mark = decimal_mark, scientific = FALSE, trim = TRUE)
+    format(x, big.mark = " ", decimal.mark = ",", scientific = FALSE, trim = TRUE)
 }
 
 #' @title A nice GT theme
