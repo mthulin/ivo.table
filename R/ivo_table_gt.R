@@ -280,7 +280,7 @@ mask_values <- function(df, upper_limit) {
             rowwise() |>
             mutate(
                 Total = if_else(
-                    sum(c_across(where(is.character)) == mask_value, na.rm = TRUE) == 1,
+                    sum(c_across(where(is.character)) %in% c(mask_value, "-"), na.rm = TRUE) == 1,
                     "-",
                     .data$Total
                 )
@@ -318,8 +318,8 @@ mask_values <- function(df, upper_limit) {
 mask_col_sums <- function(df, mask_value) {
     df |>
         mutate(across(
-            !matches("Total"),
-            ~ ifelse(sum(.x == mask_value) == 1 & row_number() == n(), "-", .x)
+            everything(),
+            ~ ifelse(sum(.x %in% c(mask_value, "-")) == 1 & row_number() == n(), "-", .x)
         ))
 }
 
