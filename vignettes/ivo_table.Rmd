@@ -19,6 +19,8 @@ knitr::opts_chunk$set(
 ## Background
 R has some great packages for creating nice-looking tables. Packages like `gt` and `flextable` allow the user to create a wide range of tables, with lots of flexibility in how these are presented and formatted. The downside to these Swiss army knife-style packages is that simple tasks, like creating a frequency table, require a lot of typing. Enter `ivo.table`, a package for creating great-looking frequency tables and contingency tables without any hassle.
 
+The package offers two functions for creating tables: `ivo_table`, which uses the `flextable` framework, and `ivo_table_gt` which uses the `gt` framework. This vignette contains examples using the former.
+
 ## A first example
 Let's look at some examples using the `penguins` data from the [`palmerpenguins`](https://cran.r-project.org/package=palmerpenguins) package. Say that we want to create a contingency table showing the counts of the categorical variables `species`, `sex`, and `island`. We can use `ftable` along with `dplyr`'s `select`:
 
