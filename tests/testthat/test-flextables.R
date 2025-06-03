@@ -14,8 +14,9 @@ with_parameters_test_that(
                 rowsums = rowsums,
                 long_table = long_table
             ) |>
-            save_as_image(path = paste0(tempdir(), "/", .test_name, ".png"))
+            save_as_html(path = paste0(tempdir(), "/", .test_name, ".html"))
 
+        normalize_html(input)
 
         expect_snapshot_file(path = input)
     },
