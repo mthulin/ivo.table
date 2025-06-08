@@ -1,20 +1,13 @@
-library(janitor)
-library(palmerpenguins)
-library(dplyr)
-
-make_cases <- function() {
-  tables <- list(
-    oneway = penguins |> select(species) |> clean_names("sentence"),
-    twoway = penguins |> mutate(bill_length_mm = cut(bill_length_mm, 3)) |>
-      select(species, bill_length_mm) |> clean_names("sentence") # ,
-    # threeway = penguins |> mutate(bill_length_mm = cut(bill_length_mm, 3)) |>
-    #   select(species, bill_length_mm, island) |> clean_names("sentence"),
-    # fourway = penguins |> mutate(bill_length_mm = cut(bill_length_mm, 3)) |>
-    #  select(species, bill_length_mm, island, sex) |> clean_names("sentence")
-  )
-
+#' @title Create test cases for flextable output
+#' @description Creates a \code{data.frame} with parameterized test to ensure consistent table visual output.
+#' @return A \code{data.frame} with parameters used for function calls.
+#' @noRd
+#' @importFrom dplyr select mutate filter row_number
+#' @importFrom tidyr expand_grid
+#' @importFrom janitor clean_names
+make_flextable_cases <- function(table_list) {
   expand_grid(
-    test_data = tables,
+    test_data = table_list,
     extra_header = c(FALSE, TRUE),
     exclude_missing = c(FALSE, TRUE),
     colsums = c(FALSE, TRUE),
@@ -26,8 +19,13 @@ make_cases <- function() {
     mutate(.test_name = paste(names(test_data), row_number(), sep = "_"))
 }
 
-normalize_html <- function(input_file) {
-  html <- readLines(input_file)
+#' @title Normalize HTML from a flextable output
+#' @description Removes randomized tokens to ensure deterministic output for tables in a HTML file
+#' @param file_path Path to HTML file containing the table.
+#' @return The same path used for input.
+#' @noRd
+normalize_html <- function(file_path) {
+  html <- readLines(file_path)
   html_text <- paste(html, collapse = "\n")
 
   # Find all randomized tokens used in the HTML output from a flextable
@@ -47,5 +45,8 @@ normalize_html <- function(input_file) {
   }
 
   # And write back the cleaned HTML
-  writeLines(html_text, input_file)
+  writeLines(html_text, file_path)
+
+  # Return the path
+  return(file_path)
 }
