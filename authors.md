@@ -11,7 +11,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/mthulin/ivo.table/blob/main/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/mthulin/ivo.table/blob/0.7.1/DESCRIPTION)
 
 Thulin M, Grind K, Furne S (2025). *ivo.table: Nicely Formatted
 Contingency Tables and Frequency Tables*. R package version 0.7.1,
