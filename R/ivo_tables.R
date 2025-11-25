@@ -129,7 +129,7 @@ ivo_tab3_step1 <- function(df, v1, v3, v4, exclude_missing, missing_string)
     ivo_excl_missing(exclude_missing, missing_string) |>
     stats::ftable(exclude=NULL) |>
     base::data.frame() |>
-    `colnames<-`(c({{v1}}, {{v3}}, {{v4}}, "Freq"))
+    `colnames<-`(c({{v4}}, {{v1}}, {{v3}}, "Freq"))
 }
 
 ivo_tab3_step2 <- function(df, v1, v3, v4, extra_header, colsums, rowsums, percent_by, remove_zero_rows, sums_string)
@@ -183,7 +183,7 @@ ivo_tab4_step1 <- function(df, v1, v2, v3, v4, exclude_missing, missing_string)
     ivo_excl_missing(exclude_missing, missing_string) |>
     stats::ftable(exclude=NULL) |>
     base::data.frame() |>
-    `colnames<-`(c({{v1}}, {{v2}}, {{v3}}, {{v4}}, "Freq"))
+    `colnames<-`(c({{v4}}, {{v1}}, {{v2}}, {{v3}}, "Freq"))
 
 }
 

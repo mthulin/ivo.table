@@ -1,6 +1,6 @@
 Package: ivo.table
 Title: Nicely Formatted Contingency Tables and Frequency Tables
-Version: 0.7.0
+Version: 0.7.1
 Authors@R: 
     c(person(given = "Måns",
            family = "Thulin",
