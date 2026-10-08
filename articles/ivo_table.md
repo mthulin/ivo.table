@@ -64,9 +64,6 @@ that we can easily export to a report or presentation.
 library(ivo.table)
 
 penguins |> select(species, sex, island) |> ivo_table()
-#> Warning in flextable::regulartable(df): 'flextable::regulartable' is deprecated.
-#> Use 'flextable' instead.
-#> See help("Deprecated")
 ```
 
 |           |           | species |           |        |
@@ -100,9 +97,6 @@ penguins |>
   select(species, sex, island) |>
   ivo_table(colsums = TRUE,
             rowsums = TRUE)
-#> Warning in flextable::regulartable(df): 'flextable::regulartable' is deprecated.
-#> Use 'flextable' instead.
-#> See help("Deprecated")
 ```
 
 |           |           | species |           |        |       |
@@ -126,9 +120,6 @@ Or show percentages instead of counts, e.g. computed by column:
 penguins |>
   select(species, sex, island) |>
   ivo_table(percent_by = "col")
-#> Warning in flextable::regulartable(df): 'flextable::regulartable' is deprecated.
-#> Use 'flextable' instead.
-#> See help("Deprecated")
 ```
 
 |           |           | species |           |        |
@@ -160,9 +151,6 @@ penguins |>
   ivo_table(color = "red",
             font_name = "Courier",
             bold_cols = 1)
-#> Warning in flextable::regulartable(df): 'flextable::regulartable' is deprecated.
-#> Use 'flextable' instead.
-#> See help("Deprecated")
 ```
 
 |           |           | species |           |        |
@@ -188,9 +176,6 @@ penguins |>
   ivo_table(caption = "A table with penguins in it",
             highlight_cols = 3,
             highlight_rows = 4)
-#> Warning in flextable::regulartable(df): 'flextable::regulartable' is deprecated.
-#> Use 'flextable' instead.
-#> See help("Deprecated")
 ```
 
 |           |           | species |           |        |
@@ -226,9 +211,6 @@ penguins |>
   flextable::fontsize(size = 8, part = "body") |> 
   flextable::fontsize(size = 12, part = "header") |> 
   flextable::bg(bg = "pink", part = "all")
-#> Warning in flextable::regulartable(df): 'flextable::regulartable' is deprecated.
-#> Use 'flextable' instead.
-#> See help("Deprecated")
 ```
 
 |           |           | species |           |        |
