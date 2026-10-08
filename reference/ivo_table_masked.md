@@ -142,124 +142,13 @@ C = sample(c("Swedish", "Norwegian", "Chilean"), 50, replace = TRUE))
 ### 1-way tables ###
 data1 <- example_data |> dplyr::select(Year)
 ivo_table_masked(data1) # No masking because all counts are >=5
+#> Warning: 'flextable::regulartable' is deprecated.
+#> Use 'flextable' instead.
+#> See help("Deprecated")
 
 
-.cl-d9453c76{}.cl-d93c6632{font-family:'Arial';font-size:11pt;font-weight:bold;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-d93c6646{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-d93ee394{margin:0;text-align:center;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-d93ee3a8{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-d93efd84{width:0.674in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 3pt solid rgba(0, 100, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-d93efd98{width:0.674in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 2pt solid rgba(153, 193, 153, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-d93efda2{width:0.674in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}
+.cl-d8bad469{}.cl-31e46462{font-family:'Arial';font-size:11pt;font-weight:bold;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-9f1c1ce9{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-a87b1e2d{margin:0;text-align:center;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-a1958ec5{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-ef6ffceb{width:0.674in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 3pt solid rgba(0, 100, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-0ad4ec36{width:0.674in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 2pt solid rgba(153, 193, 153, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-5af25830{width:0.674in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}
 
 
 Year
 ```
-
-2020
-
-2021
-
-2022
-
-2023
-
-10
-
-13
-
-12
-
-15
-
-ivo_table_masked(data1, cell = 15) \# Counts below \<=15 are masked
-
-| Year |      |      |      |
-|------|------|------|------|
-| 2020 | 2021 | 2022 | 2023 |
-| 1-15 | 1-15 | 1-15 | 1-15 |
-
-\# With pipes example_data \|\>
-dplyr::[select](https://dplyr.tidyverse.org/reference/select.html)(Year)
-\|\>
-[ivo_table](https://mthulin.github.io/ivo.table/reference/ivo_table.md)()
-
-| Year |      |      |      |
-|------|------|------|------|
-| 2020 | 2021 | 2022 | 2023 |
-| 10   | 13   | 12   | 15   |
-
-\### 2-way tables \### data2 \<- example_data \|\>
-dplyr::[select](https://dplyr.tidyverse.org/reference/select.html)(A, B)
-ivo_table_masked(data2)
-
-|         | A      |        |
-|---------|--------|--------|
-| B       | Type 1 | Type 2 |
-| Apples  | 7      | 8      |
-| Bananas | 7      | 9      |
-| Oranges | 12     | 7      |
-
-ivo_table_masked(data2, cell = 7) \# Counts \<= 7 are masked
-
-|         | A      |        |
-|---------|--------|--------|
-| B       | Type 1 | Type 2 |
-| Apples  | 1-7    | 8      |
-| Bananas | 1-7    | 9      |
-| Oranges | 12     | 1-7    |
-
-\# Row and column sums are also masked: ivo_table_masked( data2, cell =
-3, colsums = TRUE, rowsums = TRUE)
-
-|         | A      |        |       |
-|---------|--------|--------|-------|
-| B       | Type 1 | Type 2 | Total |
-| Apples  | 7      | 8      | 15    |
-| Bananas | 7      | 9      | 16    |
-| Oranges | 12     | 7      | 19    |
-| Total   | 26     | 24     | 50    |
-
-\### 3-way tables \### data3 \<- example_data \|\>
-dplyr::[select](https://dplyr.tidyverse.org/reference/select.html)(C, B,
-Year) ivo_table_masked( data3, cell = 3, caption = "Values between 1 and
-3 are masked." )
-
-|         |      | C       |           |         |
-|---------|------|---------|-----------|---------|
-| B       | Year | Chilean | Norwegian | Swedish |
-| Apples  | 2020 | 1-3     | 1-3       | 0       |
-|         | 2021 | 4       | 1-3       | 0       |
-|         | 2022 | 0       | 1-3       | 1-3     |
-|         | 2023 | 1-3     | 1-3       | 1-3     |
-| Bananas | 2020 | 1-3     | 1-3       | 1-3     |
-|         | 2021 | 1-3     | 1-3       | 1-3     |
-|         | 2022 | 0       | 1-3       | 1-3     |
-|         | 2023 | 1-3     | 1-3       | 0       |
-| Oranges | 2020 | 0       | 1-3       | 1-3     |
-|         | 2021 | 1-3     | 0         | 1-3     |
-|         | 2022 | 0       | 5         | 1-3     |
-|         | 2023 | 6       | 0         | 0       |
-
-Values between 1 and 3 are masked.
-
-\### 4-way tables \### data4 \<- example_data \|\>
-dplyr::[select](https://dplyr.tidyverse.org/reference/select.html)(Year,
-B, C, A) ivo_table_masked(data4, colsums = TRUE, rowsums = TRUE)
-
-|         |           |        | Year |      |      |      |       |
-|---------|-----------|--------|------|------|------|------|-------|
-| B       | C         | A      | 2020 | 2021 | 2022 | 2023 | Total |
-| Apples  | Chilean   | Type 1 | 0    | 1-5  | 0    | 1-5  | NA    |
-|         |           | Type 2 | 1-5  | 1-5  | 0    | 0    | NA    |
-|         | Norwegian | Type 1 | 1-5  | 1-5  | 1-5  | 0    | NA    |
-|         |           | Type 2 | 1-5  | 0    | 0    | 1-5  | NA    |
-|         | Swedish   | Type 1 | 0    | 0    | 0    | 0    | 0     |
-|         |           | Type 2 | 0    | 0    | 1-5  | 1-5  | NA    |
-| Bananas | Chilean   | Type 1 | 0    | 0    | 0    | 0    | 0     |
-|         |           | Type 2 | 1-5  | 1-5  | 0    | 1-5  | NA    |
-|         | Norwegian | Type 1 | 0    | 0    | 1-5  | 1-5  | NA    |
-|         |           | Type 2 | 1-5  | 1-5  | 1-5  | 0    | NA    |
-|         | Swedish   | Type 1 | 1-5  | 1-5  | 0    | 0    | NA    |
-|         |           | Type 2 | 0    | 0    | 1-5  | 0    | NA    |
-| Oranges | Chilean   | Type 1 | 0    | 1-5  | 0    | 1-5  | NA    |
-|         |           | Type 2 | 0    | 0    | 0    | 1-5  | NA    |
-|         | Norwegian | Type 1 | 1-5  | 0    | 1-5  | 0    | NA    |
-|         |           | Type 2 | 0    | 0    | 1-5  | 0    | NA    |
-|         | Swedish   | Type 1 | 1-5  | 1-5  | 1-5  | 0    | NA    |
-|         |           | Type 2 | 0    | 0    | 0    | 0    | 0     |
-| Total   |           |        | NA   | NA   | NA   | NA   | NA    |

@@ -23,6 +23,7 @@ counts of the categorical variables `species`, `sex`, and `island`. We
 can use `ftable` along with `dplyr`’s `select`:
 
 ``` r
+
 library(dplyr)
 #> 
 #> Attaching package: 'dplyr'
@@ -57,6 +58,7 @@ that we can easily export to a report or presentation.
 `ftable`:
 
 ``` r
+
 library(ivo.table)
 
 penguins |> select(species, sex, island) |> ivo_table_gt()
@@ -67,6 +69,7 @@ penguins |> select(species, sex, island) |> ivo_table_gt()
 You can add row and column sums:
 
 ``` r
+
 penguins |>
   select(species, sex, island) |>
   ivo_table_gt(sums = c("cols", "rows"))
@@ -85,6 +88,7 @@ Change the font to Courier, use red instead of green, and make the names
 in the `sex` column bold:
 
 ``` r
+
 library(gt)
 penguins |>
   select(species, sex, island) |>
@@ -100,6 +104,7 @@ Add a caption and highlight the cell on the fourth row of the third
 column:
 
 ``` r
+
 penguins |>
   select(species, sex, island) |>
   ivo_table_gt(caption = "A table with penguins in it") |> 
@@ -114,6 +119,7 @@ style gt tables can be used. You can also paste `ggplot2` plots and
 tables together using `patchwork`:
 
 ``` r
+
 library(ggplot2)
 library(patchwork)
 

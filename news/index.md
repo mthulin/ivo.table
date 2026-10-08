@@ -2,6 +2,8 @@
 
 ## ivo.table version 0.7.1
 
+CRAN release: 2025-11-25
+
 Fixed a bug where variable names were displayed incorrectly in three-way
 and four-way tables.
 

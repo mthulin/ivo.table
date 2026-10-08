@@ -40,6 +40,7 @@ Måns Thulin
 ## Examples
 
 ``` r
+
 library(dplyr)
 example_data <- data.frame(Year = sample(2020:2023, 50, replace = TRUE),
 A = sample(c("Type 1", "Type 2"), 50, replace = TRUE),
@@ -51,7 +52,7 @@ example_data |> select(Year, A) |>
   data.frame() |>
   ivo_table_add_mask(cell = 7)
 #>   Year      A Freq
-#> 1 2020 Type 1    8
+#> 1 2020 Type 1    9
 #> 2 2021 Type 1  1-7
 #> 3 2022 Type 1  1-7
 #> 4 2023 Type 1  1-7

@@ -11,16 +11,16 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/mthulin/ivo.table/blob/0.7.1/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/mthulin/ivo.table/blob/main/DESCRIPTION)
 
-Thulin M, Grind K, Furne S (2025). *ivo.table: Nicely Formatted
+Thulin M, Grind K, Furne S (2026). *ivo.table: Nicely Formatted
 Contingency Tables and Frequency Tables*. R package version 0.7.1,
 <https://github.com/mthulin/ivo.table>.
 
     @Manual{,
       title = {ivo.table: Nicely Formatted Contingency Tables and Frequency Tables},
       author = {Måns Thulin and Kajsa Grind and Stefan Furne},
-      year = {2025},
+      year = {2026},
       note = {R package version 0.7.1},
       url = {https://github.com/mthulin/ivo.table},
     }
