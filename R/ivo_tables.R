@@ -309,7 +309,12 @@ ivo_table_1way <- function(df, varleft, extra_header = TRUE, exclude_missing = F
 
 ivo_masked_table_1way <- function(df, varleft, cell = 5, extra_header = TRUE, exclude_missing = FALSE, missing_string = "(Missing)", colsums = FALSE, rowsums = FALSE, caption = NA, highlight_cols = NULL, highlight_rows = NULL, color = "darkgreen", font_name = "Arial", bold_cols = NULL,  long_table = FALSE, sums_string = "Total"){
   Total <- NULL
-  ncol_v4 <- df |> dplyr::pull({{varleft}}) |> unique() |> length()
+
+  ncol_v4 <- df |> dplyr::pull({{varleft}}) |>
+  (\(v) if (exclude_missing) v[!is.na(v)] else v)() |>
+  unique() |>
+  length()
+
   name_v4 <- df |> dplyr::select({{varleft}}) |> names()
 
   if(long_table) {
