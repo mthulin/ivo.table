@@ -238,7 +238,12 @@ ivo_tab4_step2 <- function(df, v1, v2, v3, v4, extra_header, colsums, rowsums, p
 ivo_table_1way <- function(df, varleft, extra_header = TRUE, exclude_missing = FALSE, missing_string = "(Missing)", colsums = colsums, rowsums = rowsums, caption = NA, highlight_cols = NULL, highlight_rows = NULL, percent_by = NA, color = "darkgreen", font_name = "Arial", bold_cols = NULL, long_table = FALSE, sums_string = "Total")
 {
   Total <- NULL
-  ncol_v4 <- df |> dplyr::pull({{varleft}}) |> unique() |> length()
+
+  ncol_v4 <- df |> dplyr::pull({{varleft}}) |>
+  (\(v) if (exclude_missing) v[!is.na(v)] else v)() |>
+  unique() |>
+  length()
+
   name_v4 <- df |> dplyr::select({{varleft}}) |> names()
 
   # Create the table
