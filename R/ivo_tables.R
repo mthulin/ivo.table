@@ -115,7 +115,7 @@ ivo_tab2_step2 <- function(df, v1, v4, extra_header, colsums, rowsums, percent_b
     }
 
   df |>
-    flextable::regulartable() |>
+    flextable::flextable() |>
     ivo_add_extra_header(name_v4, ncol_v4, 2, add = extra_header, rowsums) |>
     ivo_add_col_sums(new_row, colsums) |>
     flextable::autofit()
@@ -168,7 +168,7 @@ ivo_tab3_step2 <- function(df, v1, v3, v4, extra_header, colsums, rowsums, perce
 
 
   df |>
-    flextable::regulartable() |>
+    flextable::flextable() |>
     ivo_add_extra_header(name_v4, ncol_v4, 3, add = extra_header, rowsums) |>
     ivo_add_col_sums(new_row, colsums) |>
     flextable::merge_v(j = name_v1) |>
@@ -223,7 +223,7 @@ ivo_tab4_step2 <- function(df, v1, v2, v3, v4, extra_header, colsums, rowsums, p
     }
 
   df |>
-    flextable::regulartable() |>
+    flextable::flextable() |>
     ivo_add_extra_header(name_v4, ncol_v4, 4, add = extra_header, rowsums) |>
     ivo_add_col_sums(new_row, colsums) |>
     flextable::merge_v(j = name_v1) |>
@@ -266,7 +266,7 @@ ivo_table_1way <- function(df, varleft, extra_header = TRUE, exclude_missing = F
         }
 
 
-    df |> flextable::regulartable() |>
+    df |> flextable::flextable() |>
     ivo_add_col_sums(new_row, colsums) |>
     flextable::autofit() |>
     ivo_flextable_theme(1, rowsums = FALSE, caption, highlight_cols, highlight_rows, color, font_name, bold_cols) -> df } else {
@@ -292,7 +292,7 @@ ivo_table_1way <- function(df, varleft, extra_header = TRUE, exclude_missing = F
           df$Total <- unlist(apply(df, 1, ivo_num_sum))
           if(!rowsums) { df |> dplyr::select(-Total) -> df }
         }
-        df |> flextable::regulartable() |>
+        df |> flextable::flextable() |>
         ivo_add_extra_header_1way(name_v4, ncol_v4, extra_header, rowsums) |>
         flextable::autofit() |>
         ivo_flextable_theme(1, rowsums, caption, highlight_cols, highlight_rows, color, font_name, bold_cols) -> df
@@ -319,7 +319,7 @@ ivo_masked_table_1way <- function(df, varleft, cell = 5, extra_header = TRUE, ex
       new_row <- c(apply(df, 2, ivo_num_sum), sums_string)
           names(new_row)[length(new_row)] <- names(df)[1]
 
-      df |> flextable::regulartable() |>
+      df |> flextable::flextable() |>
       ivo_add_col_sums(new_row, colsums) |>
       flextable::autofit() |>
       ivo_flextable_theme(1, rowsums = FALSE, caption, highlight_cols, highlight_rows, color, font_name, bold_cols) } else {
@@ -334,7 +334,7 @@ ivo_masked_table_1way <- function(df, varleft, cell = 5, extra_header = TRUE, ex
         df$Total <- unlist(apply(df, 1, ivo_num_sum))
         if(!rowsums) { df |> dplyr::select(-Total) -> df }
 
-        df |> flextable::regulartable() |>
+        df |> flextable::flextable() |>
         ivo_add_extra_header_1way(name_v4, ncol_v4, extra_header, rowsums) |>
         flextable::autofit() |>
         ivo_flextable_theme(1, rowsums, caption, highlight_cols, highlight_rows, color, font_name, bold_cols)
@@ -481,7 +481,7 @@ ivo_table_add_mask <- function(df, cell = 5)
 #'   ftable(exclude=NULL) |>
 #'   data.frame() |>
 #'   spread(A, Freq) |>
-#'   regulartable() |>
+#'   flextable() |>
 #'   ivo_flextable_theme()
 #' @export
 ivo_flextable_theme <- function(x, kway = 2, rowsums = FALSE, caption = NA, highlight_cols = NULL, highlight_rows = NULL, color = "darkgreen", font_name = "Arial", bold_cols = NULL)
