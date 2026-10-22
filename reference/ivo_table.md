@@ -23,7 +23,9 @@ ivo_table(
   font_name = "Arial",
   bold_cols = NULL,
   long_table = FALSE,
-  remove_zero_rows = FALSE
+  remove_zero_rows = FALSE,
+  decimal_mark = ",",
+  big_mark = " "
 )
 ```
 
@@ -107,6 +109,16 @@ ivo_table(
 
   If set to TRUE, removes all rows that contain nothing but zeros. The
   default is FALSE.
+
+- decimal_mark:
+
+  A string containing the decimal mark used for percentages, e.g. ".".
+  Defaults to ",".
+
+- big_mark:
+
+  A string containing the character used to separate "big" numbers, e.g.
+  "," for "1,000". Defaults to " ".
 
 ## Value
 

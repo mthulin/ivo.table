@@ -2,7 +2,7 @@
 
 ![](reference/figures/logo.png)
 
-## Background
+### Background
 
 R has some great packages for creating nice-looking tables. Packages
 like `gt` and `flextable` allow the user to create a wide range of
@@ -16,7 +16,7 @@ The package offers two functions for creating tables: `ivo_table`, which
 uses the `flextable` framework, and `ivo_table_gt` which uses the `gt`
 framework. This vignette contains examples using the former.
 
-## A first example
+### A first example
 
 Let’s look at some examples using the `penguins` data from the
 [`palmerpenguins`](https://cran.r-project.org/package=palmerpenguins)
@@ -135,11 +135,48 @@ penguins |>
 |           | Dream     | 0,7 %   | 0,0 %     | 0,0 %  |
 |           | Torgersen | 3,3 %   | 0,0 %     | 0,0 %  |
 
-## Changing the appearance of your tables
+### Changing the appearance of your tables
 
 `ivo_table` has lots of options for customising the look of your table.
 You can change the colours and fonts used, highlight columns, rows or
 cells, make columns bold, and more. Let’s look at some examples.
+
+By default, `ivo_table` uses decimal commas and spaces to separate
+thousands. To instead use decimal points and commas to separate
+thousands, use the `decimal_mark` and `big_mark` arguments:
+
+``` r
+
+# Decimal points:
+penguins |>
+  select(species, sex) |> 
+  ivo_table(percent_by = "tot",
+            decimal_mark = ".")
+```
+
+|           | species |           |        |
+|-----------|---------|-----------|--------|
+| sex       | Adelie  | Chinstrap | Gentoo |
+| female    | 21.2 %  | 9.9 %     | 16.9 % |
+| male      | 21.2 %  | 9.9 %     | 17.7 % |
+| (Missing) | 1.7 %   | 0.0 %     | 1.5 %  |
+
+``` r
+
+
+# Spaces between thousands:
+df <- data.frame(Variable1 = sample(c("B", "C", "D", "B"), 10000, replace = TRUE),
+                 Variable2 = sample(c("A", "C"), 10000, replace = TRUE))
+
+df |> 
+  ivo_table(big_mark = ",")
+```
+
+|           | Variable1 |       |       |
+|-----------|-----------|-------|-------|
+| Variable2 | B         | C     | D     |
+| A         | 2,501     | 1,271 | 1,230 |
+| C         | 2,513     | 1,242 | 1,243 |
 
 Change the font to Courier, use red instead of green, and make the names
 in the `sex` column bold:
@@ -225,3 +262,49 @@ penguins |>
 | (Missing) | Biscoe    | 0       | 0         | 5      |
 |           | Dream     | 1       | 0         | 0      |
 |           | Torgersen | 5       | 0         | 0      |
+
+## Handling missing data
+
+By default, missing data are shown in the table, with the name
+`(Missing)`:
+
+``` r
+
+penguins |>
+  select(sex) |> 
+  ivo_table()
+```
+
+| sex    |      |           |
+|--------|------|-----------|
+| female | male | (Missing) |
+| 165    | 168  | 11        |
+
+To remove the `(Missing)` category, use `exclude_missing`:
+
+``` r
+
+penguins |>
+  select(sex) |> 
+  ivo_table(exclude_missing = TRUE)
+```
+
+| sex    |      |
+|--------|------|
+| female | male |
+| 165    | 168  |
+
+To instead change the text used to describe the missing category, use
+`missing_string`:
+
+``` r
+
+penguins |>
+  select(sex) |> 
+  ivo_table(missing_string = "Unknown")
+```
+
+| sex    |      |         |
+|--------|------|---------|
+| female | male | Unknown |
+| 165    | 168  | 11      |

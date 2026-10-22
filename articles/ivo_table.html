@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ivo.table</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,9 +66,9 @@
     
     
 <p><img src="reference/figures/logo.png" align="right" width="350"></p>
-<div class="section level2">
-<h2 id="background">Background<a class="anchor" aria-label="anchor" href="#background"></a>
-</h2>
+<div class="section level3">
+<h3 id="background">Background<a class="anchor" aria-label="anchor" href="#background"></a>
+</h3>
 <p>R has some great packages for creating nice-looking tables. Packages
 like <code>gt</code> and <code>flextable</code> allow the user to create
 a wide range of tables, with lots of flexibility in how these are
@@ -82,9 +82,9 @@ hassle.</p>
 and <code>ivo_table_gt</code> which uses the <code>gt</code> framework.
 This vignette contains examples using the former.</p>
 </div>
-<div class="section level2">
-<h2 id="a-first-example">A first example<a class="anchor" aria-label="anchor" href="#a-first-example"></a>
-</h2>
+<div class="section level3">
+<h3 id="a-first-example">A first example<a class="anchor" aria-label="anchor" href="#a-first-example"></a>
+</h3>
 <p>Let’s look at some examples using the <code>penguins</code> data from
 the <a href="https://cran.r-project.org/package=palmerpenguins" class="external-link"><code>palmerpenguins</code></a>
 package. Say that we want to create a contingency table showing the
@@ -394,16 +394,102 @@ that we can easily export to a report or presentation.</p>
 </table>
 </div>
 </div>
-<div class="section level2">
-<h2 id="changing-the-appearance-of-your-tables">Changing the appearance of your tables<a class="anchor" aria-label="anchor" href="#changing-the-appearance-of-your-tables"></a>
-</h2>
+<div class="section level3">
+<h3 id="changing-the-appearance-of-your-tables">Changing the appearance of your tables<a class="anchor" aria-label="anchor" href="#changing-the-appearance-of-your-tables"></a>
+</h3>
 <p><code>ivo_table</code> has lots of options for customising the look
 of your table. You can change the colours and fonts used, highlight
 columns, rows or cells, make columns bold, and more. Let’s look at some
 examples.</p>
+<p>By default, <code>ivo_table</code> uses decimal commas and spaces to
+separate thousands. To instead use decimal points and commas to separate
+thousands, use the <code>decimal_mark</code> and <code>big_mark</code>
+arguments:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Decimal points:</span></span>
+<span><span class="va">penguins</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">species</span>, <span class="va">sex</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="../reference/ivo_table.html">ivo_table</a></span><span class="op">(</span>percent_by <span class="op">=</span> <span class="st">"tot"</span>,</span>
+<span>            decimal_mark <span class="op">=</span> <span class="st">"."</span><span class="op">)</span></span></code></pre></div>
+<div class="tabwid">
+<style>.cl-d8bad469{}.cl-31e46462{font-family:'Arial';font-size:11pt;font-weight:bold;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-9f1c1ce9{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-a87b1e2d{margin:0;text-align:center;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-6477613b{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-a1958ec5{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-8f38821f{width:0.974in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 3pt solid rgba(0, 100, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-d81b129d{width:1.111in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 3pt solid rgba(0, 100, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-652d7729{width:1.021in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 3pt solid rgba(0, 100, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-a7f0007b{width:0.974in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-975a3c8f{width:1.111in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 2pt solid rgba(153, 193, 153, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-8f69aab3{width:1.021in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 2pt solid rgba(153, 193, 153, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-865e5340{width:0.974in;background-color:transparent;vertical-align: middle;border-bottom: 0.5pt solid rgba(153, 193, 153, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-494e3ed1{width:1.111in;background-color:transparent;vertical-align: middle;border-bottom: 0.5pt solid rgba(153, 193, 153, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-92c3e22c{width:1.021in;background-color:transparent;vertical-align: middle;border-bottom: 0.5pt solid rgba(153, 193, 153, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-22f920d9{width:0.974in;background-color:transparent;vertical-align: middle;border-bottom: 0.5pt solid rgba(153, 193, 153, 1.00);border-top: 0.5pt solid rgba(153, 193, 153, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-dd575f85{width:1.111in;background-color:transparent;vertical-align: middle;border-bottom: 0.5pt solid rgba(153, 193, 153, 1.00);border-top: 0.5pt solid rgba(153, 193, 153, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-6ae8b39e{width:1.021in;background-color:transparent;vertical-align: middle;border-bottom: 0.5pt solid rgba(153, 193, 153, 1.00);border-top: 0.5pt solid rgba(153, 193, 153, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-140a9968{width:0.974in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 0.5pt solid rgba(153, 193, 153, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e947d5cb{width:1.111in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 0.5pt solid rgba(153, 193, 153, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-c980d61a{width:1.021in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 0.5pt solid rgba(153, 193, 153, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style>
+<table data-quarto-disable-processing="true" class="table cl-d8bad469">
+<thead>
+<tr style="overflow-wrap:break-word;">
+<th class="cl-8f38821f"><p class="cl-a87b1e2d"><span class="cl-31e46462"></span></p></th>
+<th colspan="3" class="cl-d81b129d"><p class="cl-a87b1e2d"><span class="cl-31e46462">species</span></p></th>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<th class="cl-a7f0007b"><p class="cl-6477613b"><span class="cl-31e46462">sex</span></p></th>
+<th class="cl-975a3c8f"><p class="cl-a1958ec5"><span class="cl-31e46462">Adelie</span></p></th>
+<th class="cl-8f69aab3"><p class="cl-a1958ec5"><span class="cl-31e46462">Chinstrap</span></p></th>
+<th class="cl-975a3c8f"><p class="cl-a1958ec5"><span class="cl-31e46462">Gentoo</span></p></th>
+</tr>
+</thead>
+<tbody>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-865e5340"><p class="cl-6477613b"><span class="cl-9f1c1ce9">female</span></p></td>
+<td class="cl-494e3ed1"><p class="cl-a1958ec5"><span class="cl-9f1c1ce9">21.2 %</span></p></td>
+<td class="cl-92c3e22c"><p class="cl-a1958ec5"><span class="cl-9f1c1ce9">9.9 %</span></p></td>
+<td class="cl-494e3ed1"><p class="cl-a1958ec5"><span class="cl-9f1c1ce9">16.9 %</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-22f920d9"><p class="cl-6477613b"><span class="cl-9f1c1ce9">male</span></p></td>
+<td class="cl-dd575f85"><p class="cl-a1958ec5"><span class="cl-9f1c1ce9">21.2 %</span></p></td>
+<td class="cl-6ae8b39e"><p class="cl-a1958ec5"><span class="cl-9f1c1ce9">9.9 %</span></p></td>
+<td class="cl-dd575f85"><p class="cl-a1958ec5"><span class="cl-9f1c1ce9">17.7 %</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-140a9968"><p class="cl-6477613b"><span class="cl-9f1c1ce9">(Missing)</span></p></td>
+<td class="cl-e947d5cb"><p class="cl-a1958ec5"><span class="cl-9f1c1ce9">1.7 %</span></p></td>
+<td class="cl-c980d61a"><p class="cl-a1958ec5"><span class="cl-9f1c1ce9">0.0 %</span></p></td>
+<td class="cl-e947d5cb"><p class="cl-a1958ec5"><span class="cl-9f1c1ce9">1.5 %</span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="co"># Spaces between thousands:</span></span>
+<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>Variable1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"B"</span>, <span class="st">"C"</span>, <span class="st">"D"</span>, <span class="st">"B"</span><span class="op">)</span>, <span class="fl">10000</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>                 Variable2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span>, <span class="st">"C"</span><span class="op">)</span>, <span class="fl">10000</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">df</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="../reference/ivo_table.html">ivo_table</a></span><span class="op">(</span>big_mark <span class="op">=</span> <span class="st">","</span><span class="op">)</span></span></code></pre></div>
+<div class="tabwid">
+<style>.cl-d8bad469{}.cl-31e46462{font-family:'Arial';font-size:11pt;font-weight:bold;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-9f1c1ce9{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-a87b1e2d{margin:0;text-align:center;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-6477613b{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-a1958ec5{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-3ffc0263{width:1.013in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 3pt solid rgba(0, 100, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-a58f9b33{width:0.723in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 3pt solid rgba(0, 100, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-35679956{width:1.013in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-bb5c5f48{width:0.723in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 2pt solid rgba(153, 193, 153, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-9f12b74b{width:1.013in;background-color:transparent;vertical-align: middle;border-bottom: 0.5pt solid rgba(153, 193, 153, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b64ddcab{width:0.723in;background-color:transparent;vertical-align: middle;border-bottom: 0.5pt solid rgba(153, 193, 153, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-6b6633b3{width:1.013in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 0.5pt solid rgba(153, 193, 153, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-20c517c6{width:0.723in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 0.5pt solid rgba(153, 193, 153, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style>
+<table data-quarto-disable-processing="true" class="table cl-d8bad469">
+<thead>
+<tr style="overflow-wrap:break-word;">
+<th class="cl-3ffc0263"><p class="cl-a87b1e2d"><span class="cl-31e46462"></span></p></th>
+<th colspan="3" class="cl-a58f9b33"><p class="cl-a87b1e2d"><span class="cl-31e46462">Variable1</span></p></th>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<th class="cl-35679956"><p class="cl-6477613b"><span class="cl-31e46462">Variable2</span></p></th>
+<th class="cl-bb5c5f48"><p class="cl-a1958ec5"><span class="cl-31e46462">B</span></p></th>
+<th class="cl-bb5c5f48"><p class="cl-a1958ec5"><span class="cl-31e46462">C</span></p></th>
+<th class="cl-bb5c5f48"><p class="cl-a1958ec5"><span class="cl-31e46462">D</span></p></th>
+</tr>
+</thead>
+<tbody>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-9f12b74b"><p class="cl-6477613b"><span class="cl-9f1c1ce9">A</span></p></td>
+<td class="cl-b64ddcab"><p class="cl-a1958ec5"><span class="cl-9f1c1ce9">2,501</span></p></td>
+<td class="cl-b64ddcab"><p class="cl-a1958ec5"><span class="cl-9f1c1ce9">1,271</span></p></td>
+<td class="cl-b64ddcab"><p class="cl-a1958ec5"><span class="cl-9f1c1ce9">1,230</span></p></td>
+</tr>
+<tr style="overflow-wrap:break-word;">
+<td class="cl-6b6633b3"><p class="cl-6477613b"><span class="cl-9f1c1ce9">C</span></p></td>
+<td class="cl-20c517c6"><p class="cl-a1958ec5"><span class="cl-9f1c1ce9">2,513</span></p></td>
+<td class="cl-20c517c6"><p class="cl-a1958ec5"><span class="cl-9f1c1ce9">1,242</span></p></td>
+<td class="cl-20c517c6"><p class="cl-a1958ec5"><span class="cl-9f1c1ce9">1,243</span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
 <p>Change the font to Courier, use red instead of green, and make the
 names in the <code>sex</code> column bold:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">penguins</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">species</span>, <span class="va">sex</span>, <span class="va">island</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/ivo_table.html">ivo_table</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"red"</span>,</span>
@@ -488,7 +574,7 @@ names in the <code>sex</code> column bold:</p>
 </div>
 <p>Add a caption and highlight the cell on the fourth row of the third
 column:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">penguins</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">species</span>, <span class="va">sex</span>, <span class="va">island</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/ivo_table.html">ivo_table</a></span><span class="op">(</span>caption <span class="op">=</span> <span class="st">"A table with penguins in it"</span>,</span>
@@ -578,7 +664,7 @@ used to style flextables</a> can be used. For instance, you can change
 the font size used in different parts of the table using
 <code><a href="https://davidgohel.github.io/flextable/reference/fontsize.html" class="external-link">flextable::fontsize</a></code> and change the background colour using
 <code><a href="https://davidgohel.github.io/flextable/reference/bg.html" class="external-link">flextable::bg</a></code>:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">penguins</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">species</span>, <span class="va">sex</span>, <span class="va">island</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/ivo_table.html">ivo_table</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"darkblue"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
@@ -660,6 +746,80 @@ the font size used in different parts of the table using
 <td class="cl-5628587d"><p class="cl-a1958ec5"><span class="cl-1233c01e">0</span></p></td>
 </tr>
 </tbody>
+</table>
+</div>
+</div>
+<div class="section level2">
+<h2 id="handling-missing-data">Handling missing data<a class="anchor" aria-label="anchor" href="#handling-missing-data"></a>
+</h2>
+<p>By default, missing data are shown in the table, with the name
+<code>(Missing)</code>:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">penguins</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">sex</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="../reference/ivo_table.html">ivo_table</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<div class="tabwid">
+<style>.cl-d8bad469{}.cl-31e46462{font-family:'Arial';font-size:11pt;font-weight:bold;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-9f1c1ce9{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-a87b1e2d{margin:0;text-align:center;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-a1958ec5{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-ef684d37{width:0.812in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 3pt solid rgba(0, 100, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-3b83da0f{width:0.664in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 3pt solid rgba(0, 100, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-3b70567c{width:0.974in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 3pt solid rgba(0, 100, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ec1e0a2b{width:0.812in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 2pt solid rgba(153, 193, 153, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-bcadbea8{width:0.664in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 2pt solid rgba(153, 193, 153, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-eee65c49{width:0.974in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 2pt solid rgba(153, 193, 153, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-7acded35{width:0.812in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-dbc067c1{width:0.664in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-8ba9926a{width:0.974in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style>
+<table data-quarto-disable-processing="true" class="table cl-d8bad469">
+<thead>
+<tr style="overflow-wrap:break-word;"><th colspan="3" class="cl-ef684d37"><p class="cl-a87b1e2d"><span class="cl-31e46462">sex</span></p></th></tr>
+<tr style="overflow-wrap:break-word;">
+<th class="cl-ec1e0a2b"><p class="cl-a1958ec5"><span class="cl-31e46462">female</span></p></th>
+<th class="cl-bcadbea8"><p class="cl-a1958ec5"><span class="cl-31e46462">male</span></p></th>
+<th class="cl-eee65c49"><p class="cl-a1958ec5"><span class="cl-31e46462">(Missing)</span></p></th>
+</tr>
+</thead>
+<tbody><tr style="overflow-wrap:break-word;">
+<td class="cl-7acded35"><p class="cl-a1958ec5"><span class="cl-9f1c1ce9">165</span></p></td>
+<td class="cl-dbc067c1"><p class="cl-a1958ec5"><span class="cl-9f1c1ce9">168</span></p></td>
+<td class="cl-8ba9926a"><p class="cl-a1958ec5"><span class="cl-9f1c1ce9">11</span></p></td>
+</tr></tbody>
+</table>
+</div>
+<p>To remove the <code>(Missing)</code> category, use
+<code>exclude_missing</code>:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">penguins</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">sex</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="../reference/ivo_table.html">ivo_table</a></span><span class="op">(</span>exclude_missing <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<div class="tabwid">
+<style>.cl-d8bad469{}.cl-31e46462{font-family:'Arial';font-size:11pt;font-weight:bold;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-9f1c1ce9{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-a87b1e2d{margin:0;text-align:center;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-a1958ec5{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-ef684d37{width:0.812in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 3pt solid rgba(0, 100, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-3b83da0f{width:0.664in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 3pt solid rgba(0, 100, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ec1e0a2b{width:0.812in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 2pt solid rgba(153, 193, 153, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-bcadbea8{width:0.664in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 2pt solid rgba(153, 193, 153, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-7acded35{width:0.812in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-dbc067c1{width:0.664in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style>
+<table data-quarto-disable-processing="true" class="table cl-d8bad469">
+<thead>
+<tr style="overflow-wrap:break-word;"><th colspan="2" class="cl-ef684d37"><p class="cl-a87b1e2d"><span class="cl-31e46462">sex</span></p></th></tr>
+<tr style="overflow-wrap:break-word;">
+<th class="cl-ec1e0a2b"><p class="cl-a1958ec5"><span class="cl-31e46462">female</span></p></th>
+<th class="cl-bcadbea8"><p class="cl-a1958ec5"><span class="cl-31e46462">male</span></p></th>
+</tr>
+</thead>
+<tbody><tr style="overflow-wrap:break-word;">
+<td class="cl-7acded35"><p class="cl-a1958ec5"><span class="cl-9f1c1ce9">165</span></p></td>
+<td class="cl-dbc067c1"><p class="cl-a1958ec5"><span class="cl-9f1c1ce9">168</span></p></td>
+</tr></tbody>
+</table>
+</div>
+<p>To instead change the text used to describe the missing category, use
+<code>missing_string</code>:</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">penguins</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">sex</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="../reference/ivo_table.html">ivo_table</a></span><span class="op">(</span>missing_string <span class="op">=</span> <span class="st">"Unknown"</span><span class="op">)</span></span></code></pre></div>
+<div class="tabwid">
+<style>.cl-d8bad469{}.cl-31e46462{font-family:'Arial';font-size:11pt;font-weight:bold;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-9f1c1ce9{font-family:'Arial';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-a87b1e2d{margin:0;text-align:center;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-a1958ec5{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-ef684d37{width:0.812in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 3pt solid rgba(0, 100, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-3b83da0f{width:0.664in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 3pt solid rgba(0, 100, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-39a27103{width:0.994in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 3pt solid rgba(0, 100, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ec1e0a2b{width:0.812in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 2pt solid rgba(153, 193, 153, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-bcadbea8{width:0.664in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 2pt solid rgba(153, 193, 153, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-54974e15{width:0.994in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 2pt solid rgba(153, 193, 153, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-7acded35{width:0.812in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-dbc067c1{width:0.664in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b36bd5be{width:0.994in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(153, 193, 153, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style>
+<table data-quarto-disable-processing="true" class="table cl-d8bad469">
+<thead>
+<tr style="overflow-wrap:break-word;"><th colspan="3" class="cl-ef684d37"><p class="cl-a87b1e2d"><span class="cl-31e46462">sex</span></p></th></tr>
+<tr style="overflow-wrap:break-word;">
+<th class="cl-ec1e0a2b"><p class="cl-a1958ec5"><span class="cl-31e46462">female</span></p></th>
+<th class="cl-bcadbea8"><p class="cl-a1958ec5"><span class="cl-31e46462">male</span></p></th>
+<th class="cl-54974e15"><p class="cl-a1958ec5"><span class="cl-31e46462">Unknown</span></p></th>
+</tr>
+</thead>
+<tbody><tr style="overflow-wrap:break-word;">
+<td class="cl-7acded35"><p class="cl-a1958ec5"><span class="cl-9f1c1ce9">165</span></p></td>
+<td class="cl-dbc067c1"><p class="cl-a1958ec5"><span class="cl-9f1c1ce9">168</span></p></td>
+<td class="cl-b36bd5be"><p class="cl-a1958ec5"><span class="cl-9f1c1ce9">11</span></p></td>
+</tr></tbody>
 </table>
 </div>
 </div>

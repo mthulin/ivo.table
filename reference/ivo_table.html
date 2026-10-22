@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ivo.table</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -59,7 +59,9 @@
 <span>  font_name <span class="op">=</span> <span class="st">"Arial"</span>,</span>
 <span>  bold_cols <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  long_table <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  remove_zero_rows <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  remove_zero_rows <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  decimal_mark <span class="op">=</span> <span class="st">","</span>,</span>
+<span>  big_mark <span class="op">=</span> <span class="st">" "</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -129,6 +131,14 @@
 
 <dt id="arg-remove-zero-rows">remove_zero_rows<a class="anchor" aria-label="anchor" href="#arg-remove-zero-rows"></a></dt>
 <dd><p>If set to TRUE, removes all rows that contain nothing but zeros. The default is FALSE.</p></dd>
+
+
+<dt id="arg-decimal-mark">decimal_mark<a class="anchor" aria-label="anchor" href="#arg-decimal-mark"></a></dt>
+<dd><p>A string containing the decimal mark used for percentages, e.g. ".". Defaults to ",".</p></dd>
+
+
+<dt id="arg-big-mark">big_mark<a class="anchor" aria-label="anchor" href="#arg-big-mark"></a></dt>
+<dd><p>A string containing the character used to separate "big" numbers, e.g. "," for "1,000". Defaults to " ".</p></dd>
 
 </dl></div>
     <div class="section level2">
