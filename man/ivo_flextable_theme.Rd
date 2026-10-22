@@ -14,7 +14,9 @@ ivo_flextable_theme(
   highlight_rows = NULL,
   color = "darkgreen",
   font_name = "Arial",
-  bold_cols = NULL
+  bold_cols = NULL,
+  decimal_mark = ",",
+  big_mark = " "
 )
 }
 \arguments{
@@ -35,6 +37,10 @@ ivo_flextable_theme(
 \item{font_name}{The name of the font to be used in the table. Defaults to "Arial".}
 
 \item{bold_cols}{A numeric vector containing the indices of the columns that should use a bold font.}
+
+\item{decimal_mark}{A string containing the decimal mark used for percentages, e.g. ".". Defaults to ",".}
+
+\item{big_mark}{A string containing the character used to separate "big" numbers, e.g. "," for "1,000". Defaults to " ".}
 }
 \value{
 A styled flextable.
@@ -57,7 +63,7 @@ example_data |> select(B, A) |>
   ftable(exclude=NULL) |>
   data.frame() |>
   spread(A, Freq) |>
-  regulartable() |>
+  flextable() |>
   ivo_flextable_theme()
 }
 \author{

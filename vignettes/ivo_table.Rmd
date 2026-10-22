@@ -72,6 +72,24 @@ penguins |>
 ## Changing the appearance of your tables
 `ivo_table` has lots of options for customising the look of your table. You can change the colours and fonts used, highlight columns, rows or cells, make columns bold, and more. Let's look at some examples.
 
+By default, `ivo_table` uses decimal commas and spaces to separate thousands. To instead use decimal points and commas to separate thousands, use the `decimal_mark` and `big_mark` arguments:
+
+```{r}
+# Decimal points:
+penguins |>
+  select(species, sex) |> 
+  ivo_table(percent_by = "tot",
+            decimal_mark = ".")
+
+# Spaces between thousands:
+df <- data.frame(Variable1 = sample(c("B", "C", "D", "B"), 10000, replace = TRUE),
+                 Variable2 = sample(c("A", "C"), 10000, replace = TRUE))
+
+df |> 
+  ivo_table(big_mark = ",")
+```
+
+
 Change the font to Courier, use red instead of green, and make the names in the `sex` column bold:
 
 ```{r example6}
@@ -101,4 +119,29 @@ penguins |>
   flextable::fontsize(size = 8, part = "body") |> 
   flextable::fontsize(size = 12, part = "header") |> 
   flextable::bg(bg = "pink", part = "all")
+```
+
+
+# Handling missing data
+By default, missing data are shown in the table, with the name `(Missing)`:
+
+```{r}
+penguins |>
+  select(sex) |> 
+  ivo_table()
+```
+
+To remove the `(Missing)` category, use `exclude_missing`:
+
+```{r}
+penguins |>
+  select(sex) |> 
+  ivo_table(exclude_missing = TRUE)
+```
+
+To instead change the text used to describe the missing category, use `missing_string`:
+```{r}
+penguins |>
+  select(sex) |> 
+  ivo_table(missing_string = "Unknown")
 ```
