@@ -1,0 +1,26 @@
+library(janitor)
+library(palmerpenguins)
+library(flextable)
+library(patrick)
+
+table_data <- construct_test_data()
+
+with_parameters_test_that(
+    "the ivo_table flextable output is consistent",
+    {
+        input <- test_data |>
+            ivo_table(
+                extra_header = extra_header,
+                exclude_missing = exclude_missing,
+                colsums = colsums,
+                rowsums = rowsums,
+                long_table = long_table
+            ) |>
+            autofit() |>
+            save_as_html(path = paste0(tempdir(), "/", .test_name, ".html")) |>
+            normalize_html()
+
+        expect_snapshot_file(path = input)
+    },
+    .cases = make_flextable_cases(table_data)
+)
