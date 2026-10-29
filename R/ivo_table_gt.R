@@ -64,7 +64,7 @@
 #' ivo_table_gt(
 #'     data2,
 #'     mask = 3,
-#'     sums = c("cols", "rows"),
+#'     sums = c("cols", "rows")
 #' )
 #'
 #' # Add a note at the end of the table:
@@ -133,7 +133,7 @@ ivo_table_gt <- function(
     gt_table <- df |>
       gt(
         rowname_col = if (num_vars == 3) columns[3] else columns[2],
-        groupname_col = if (num_vars == 3) columns[2] else NULL,
+        groupname_col = if (num_vars == 3) columns[2] else NULL
       )
     if (num_vars == 2) {
       gt_table <- gt_table |> tab_stubhead(columns[2])
@@ -153,7 +153,7 @@ ivo_table_gt <- function(
   }
 
   # Don't draw the spanner over "Total"
-  if (extra_header & num_vars > 1) {
+  if (extra_header && num_vars > 1) {
     gt_table <- gt_table |>
       tab_spanner(
         label = columns[1],

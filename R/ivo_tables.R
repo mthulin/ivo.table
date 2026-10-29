@@ -58,8 +58,8 @@ ivo_excl_missing <- function(
   missing_string = "(Missing)"
 ) {
   if (!exclude_missing) {
-    for (i in 1:ncol(df)) {
-      if (is.factor(df[[i]]) & sum(is.na(df[[i]])) > 0) {
+    for (i in seq_len(ncol(df))) {
+      if (is.factor(df[[i]]) && sum(is.na(df[[i]])) > 0) {
         levs <- levels(df[[i]])
         df[[i]] <- as.character(df[[i]])
         df[is.na(df[[i]]), i] <- "6049122418972891471204127890512XY"
@@ -1355,7 +1355,7 @@ ivo_table <- function(
   var_name <- names(df)
   points <- length(c(grep("[.]", base::deparse(base::substitute(var_name)))))
   spaces <- length(c(grep(" ", base::deparse(base::substitute(var_name)))))
-  if (points > 0 & spaces > 0) {
+  if (points > 0 && spaces > 0) {
     var_name <- gsub(".", " ", x = var_name, fixed = TRUE)
     df <- df |> dplyr::rename_at(dplyr::vars(names(df)), ~var_name)
     message("Dots have been replaced with spaces in the variable names.")
@@ -1569,7 +1569,7 @@ ivo_table_masked <- function(
   var_name <- names(df)
   points <- length(c(grep("[.]", base::deparse(base::substitute(var_name)))))
   spaces <- length(c(grep(" ", base::deparse(base::substitute(var_name)))))
-  if (points > 0 & spaces > 0) {
+  if (points > 0 && spaces > 0) {
     var_name <- gsub(".", " ", x = var_name, fixed = TRUE)
     df <- df |> dplyr::rename_at(dplyr::vars(names(df)), ~var_name)
     message("Dots have been replaced with spaces in the variable names.")
