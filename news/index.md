@@ -2,6 +2,8 @@
 
 ## ivo.table version 0.8.0
 
+CRAN release: 2026-10-22
+
 Added options for using different symbols for decimal separators and
 thousands separators. Added more examples to the `ivo_table` vignette.
 Fixed a bug related to how missing values were handled.
