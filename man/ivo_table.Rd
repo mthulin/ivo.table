@@ -21,7 +21,9 @@ ivo_table(
   font_name = "Arial",
   bold_cols = NULL,
   long_table = FALSE,
-  remove_zero_rows = FALSE
+  remove_zero_rows = FALSE,
+  decimal_mark = ",",
+  big_mark = " "
 )
 }
 \arguments{
@@ -56,6 +58,10 @@ ivo_table(
 \item{long_table}{For one-way tables: FALSE (the default) means that the table will be wide and consist of a single row, TRUE means that the table will be long and consist of a single column.}
 
 \item{remove_zero_rows}{If set to TRUE, removes all rows that contain nothing but zeros. The default is FALSE.}
+
+\item{decimal_mark}{A string containing the decimal mark used for percentages, e.g. ".". Defaults to ",".}
+
+\item{big_mark}{A string containing the character used to separate "big" numbers, e.g. "," for "1,000". Defaults to " ".}
 }
 \value{
 A stylized \code{flextable}.

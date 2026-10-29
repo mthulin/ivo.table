@@ -1,5 +1,11 @@
-# Development
-Fixed a bug that caused errors when ivo_table() was used with numeric variables with missing data in tibbles. Added a function for creating gt tables.
+# ivo.table version 0.8.0
+Added options for using different symbols for decimal separators and thousands separators. Added more examples to the `ivo_table` vignette. Fixed a bug related to how missing values were handled.
+
+# ivo.table version 0.7.1
+Fixed a bug where variable names were displayed incorrectly in three-way and four-way tables.
+
+# ivo.table version 0.7
+Added a function for creating gt tables. Fixed a bug that caused errors when ivo_table() was used with numeric variables with missing data in tibbles. Fixed a bug that occured in three-way tables when variable names contained spaces.
 
 # ivo.table version 0.6
 Added options for table formatting. Added a vignette.
